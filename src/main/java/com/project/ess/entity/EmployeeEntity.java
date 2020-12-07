@@ -3,7 +3,8 @@ package com.project.ess.entity;
 import javax.persistence.*;
 import java.time.LocalDate;
 
-@Entity(name = "employee")
+@Entity()
+@Table(name = "employee")
 public class EmployeeEntity {
 
     @Id

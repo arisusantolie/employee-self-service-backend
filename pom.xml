@@ -56,7 +56,12 @@
 		</dependency>
 
 
-
+		<!--		untuk mapping selain beanutil karena mengandung DTO didalamnya-->
+		<dependency>
+			<groupId>org.modelmapper.extensions</groupId>
+			<artifactId>modelmapper-spring</artifactId>
+			<version>2.3.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -26,6 +26,15 @@ public class FamilyRequestEntity {
 
     private Long approvedBy;
     private LocalDateTime approvedDatetime;
+    private String fileName;
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
     public Long getApprovedBy() {
         return approvedBy;

@@ -10,6 +10,7 @@ import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.execptions.ErrorMessage;
 import com.project.ess.model.AddressResponse;
+import com.project.ess.model.UploadFileResponse;
 import com.project.ess.model.jsondata.AddressRequestJsonData;
 import com.project.ess.repository.AddressRepository;
 import com.project.ess.repository.AddressRequestRepository;
@@ -87,7 +88,11 @@ public class AddressService {
         addressRequestEntity.setStatus("PENDING");
         addressRequestEntity.setRequestDateTime(LocalDateTime.now());
         addressRequestEntity.setRequestData(addressRequestJsonData.toString());
-        addressRequestEntity.setAttachmentPath(uploadFileService.storeFile(file));
+
+        UploadFileResponse uploadFileResponse=uploadFileService.storeFile(file);
+
+        addressRequestEntity.setAttachmentPath(uploadFileResponse.getAttachment());
+        addressRequestEntity.setFileName(uploadFileResponse.getFileName());
 
         addressRequestRepository.save(addressRequestEntity);
 
@@ -136,7 +141,10 @@ public class AddressService {
         addressRequestEntity.setStatus("PENDING");
         addressRequestEntity.setRequestDateTime(LocalDateTime.now());
         addressRequestEntity.setRequestData(addressRequestJsonData.toString());
-        addressRequestEntity.setAttachmentPath(uploadFileService.storeFile(file));
+        UploadFileResponse uploadFileResponse=uploadFileService.storeFile(file);
+
+        addressRequestEntity.setAttachmentPath(uploadFileResponse.getAttachment());
+        addressRequestEntity.setFileName(uploadFileResponse.getFileName());
 
 //        System.out.println(addressRequestJsonData.toString());
 

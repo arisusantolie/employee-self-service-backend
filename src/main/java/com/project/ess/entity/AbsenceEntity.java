@@ -1,5 +1,6 @@
 package com.project.ess.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.ess.entity.compositekey.AbsenceId;
 
 import javax.persistence.*;
@@ -16,18 +17,34 @@ public class AbsenceEntity {
     private EmployeeEntity employeeNo;
 
     @Id
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime requestDateTime;
 
     private String requestNo;
     private int amount;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
     private String remark;
     private String type;
     private String status;
     private String attachment;
     private Long approvedBy;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDate approvedDatetime;
+    private String fileName;
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
     public String getAttachment() {
         return attachment;

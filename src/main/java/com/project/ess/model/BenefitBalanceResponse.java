@@ -1,15 +1,21 @@
 package com.project.ess.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class BenefitBalanceResponse {
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDate startDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDate endDate;
     private int period;
     private Long employeeNo;
     private BigDecimal balanceLimit;
     private Long benefitPlanId;
+
 
     public Long getBenefitPlanId() {
         return benefitPlanId;

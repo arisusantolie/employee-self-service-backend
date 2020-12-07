@@ -1,20 +1,27 @@
 package com.project.ess.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class AbsenceResponse {
     private int amount;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
     private String remark;
     private String type;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime requestDatetime;
     private Long approvedBy;
     private String status;
     private String attachment;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private String approvedDatetime;
     private String requestNo;
+
 
     public int getAmount() {
         return amount;

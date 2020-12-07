@@ -9,6 +9,7 @@ import com.project.ess.entity.FamilyRequestEntity;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.model.FamilyResponse;
+import com.project.ess.model.UploadFileResponse;
 import com.project.ess.model.jsondata.FamilyRequestJsonData;
 import com.project.ess.repository.EmployeeRepository;
 import com.project.ess.repository.FamilyRepository;
@@ -112,7 +113,10 @@ public class FamilyService {
         familyRequestEntity.setStatus("PENDING");
         familyRequestEntity.setRequestDateTime(LocalDateTime.now());
         familyRequestEntity.setRequestData(familyRequestJsonData.toString());
-        familyRequestEntity.setAttachmentPath(uploadFileService.storeFile(file));
+        UploadFileResponse uploadFileResponse=uploadFileService.storeFile(file);
+
+        familyRequestEntity.setAttachmentPath(uploadFileResponse.getAttachment());
+        familyRequestEntity.setFileName(uploadFileResponse.getFileName());
 
         familyRequestRepository.save(familyRequestEntity);
 

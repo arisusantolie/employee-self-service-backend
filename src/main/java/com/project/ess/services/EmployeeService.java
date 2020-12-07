@@ -8,6 +8,7 @@ import com.project.ess.entity.*;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.model.EmployeeResponse;
+import com.project.ess.model.UploadFileResponse;
 import com.project.ess.model.jsondata.AddressRequestJsonData;
 import com.project.ess.model.jsondata.EmployeeRequestJsonData;
 import com.project.ess.repository.EmployeeRepository;
@@ -101,7 +102,10 @@ public class EmployeeService {
         employeeRequestEntity.setEmployeeNo(employeeEntity);
         employeeRequestEntity.setStatus("PENDING");
         employeeRequestEntity.setRequestDateTime(LocalDateTime.now());
-        employeeRequestEntity.setAttachment(uploadFileService.storeFile(file));
+        UploadFileResponse uploadFileResponse=uploadFileService.storeFile(file);
+
+        employeeRequestEntity.setAttachment(uploadFileResponse.getAttachment());
+        employeeRequestEntity.setFileName(uploadFileResponse.getFileName());
 
 
 

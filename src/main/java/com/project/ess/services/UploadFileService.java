@@ -3,6 +3,7 @@ package com.project.ess.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ess.dto.FileUploadDTO;
 import com.project.ess.execptions.CustomGenericException;
+import com.project.ess.model.UploadFileResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -27,7 +28,7 @@ public class UploadFileService {
 
     private Path fileStorageLocation;
 
-    public String storeFile(MultipartFile file){
+    public UploadFileResponse storeFile(MultipartFile file){
         String fileName= StringUtils.cleanPath(file.getOriginalFilename());
         fileName=fileName.toLowerCase().replace(" ","-");
         String contentType=file.getContentType();
@@ -47,7 +48,7 @@ public class UploadFileService {
                     .toUriString();
 
 //            FileUploadDTO newData=new FileUploadDTO();
-            return UPLOAD_DIR+fileName;
+            return new UploadFileResponse(UPLOAD_DIR+fileName,contentType,fileName);
 //            userProfileUploadDummyControllerRepository.save(newData);
 //
 //            return new UserProfileUploadDummyDTO(fileName,contentType,fileDownloadUri);

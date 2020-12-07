@@ -28,6 +28,15 @@ public class BenefitRequestEntity {
     private Long approvedBy;
     private LocalDateTime approvedDatetime;
     private String attachment;
+    private String fileName;
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
     public String getAttachment() {
         return attachment;
