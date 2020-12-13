@@ -30,6 +30,15 @@ public class AddressRequestEntity {
     private Long approvedBy;
     private LocalDateTime approvedDatetime;
     private String fileName;
+    private String requestNo;
+
+    public String getRequestNo() {
+        return requestNo;
+    }
+
+    public void setRequestNo(String requestNo) {
+        this.requestNo = requestNo;
+    }
 
     public String getFileName() {
         return fileName;

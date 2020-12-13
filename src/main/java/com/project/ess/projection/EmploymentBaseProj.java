@@ -17,5 +17,6 @@ public interface EmploymentBaseProj {
     @Value("#{target.endDate=='4000-12-31' ? target.endDate : '-'}")
     String getEndDate();
 
-
+    @Value("#{target.employee.firstName+' '+target.employee.lastName}")
+    String getName();
 }

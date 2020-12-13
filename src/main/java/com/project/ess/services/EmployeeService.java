@@ -1,5 +1,6 @@
 package com.project.ess.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ess.dto.AddressRequestDTO;
 import com.project.ess.dto.EmployeeDTO;
@@ -7,13 +8,18 @@ import com.project.ess.dto.EmployeeRequestDTO;
 import com.project.ess.entity.*;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
+import com.project.ess.model.EmployeeNeedApproveResponse;
+import com.project.ess.model.EmployeeRequestResponse;
 import com.project.ess.model.EmployeeResponse;
 import com.project.ess.model.UploadFileResponse;
 import com.project.ess.model.jsondata.AddressRequestJsonData;
 import com.project.ess.model.jsondata.EmployeeRequestJsonData;
+import com.project.ess.projection.EmploymentBaseProj;
 import com.project.ess.repository.EmployeeRepository;
 import com.project.ess.repository.EmployeeRequestRepository;
+import com.project.ess.repository.EmploymentRepository;
 import com.project.ess.repository.UserRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,11 +27,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -45,6 +54,9 @@ public class EmployeeService {
 
     @Autowired
     EmployeeRequestRepository employeeRequestRepository;
+
+    @Autowired
+    EmploymentRepository employmentRepository;
 
     @Transactional
     public EmployeeResponse createEmployee(EmployeeDTO request){
@@ -129,6 +141,7 @@ public class EmployeeService {
 
 
         employeeRequestEntity.setRequestData(employeeRequestJsonData.toString());
+        employeeRequestEntity.setRequestNo("EMPREQ/"+LocalDate.now()+"/"+employeeEntity.getEmployeeNo());
 
 
 
@@ -148,4 +161,70 @@ public class EmployeeService {
 
         return new ResponseEntity<CustomMessageWithId>(new CustomMessageWithId("Submit Successfully and will be check.",false,employeeEntity.getEmployeeNo()), HttpStatus.OK);
     }
+
+
+    public List<EmployeeRequestResponse> getListEmployeeRequest(String email){
+
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+        List<EmployeeRequestResponse> allList=new ArrayList<>();
+
+        ObjectMapper objectMapper=new ObjectMapper();
+        employeeRequestRepository.findByEmployeeNoOrderByRequestDateTime(employeeEntity).forEach(x->{
+
+
+            EmployeeRequestJsonData employeeRequestJsonData=new EmployeeRequestJsonData();
+            try {
+                employeeRequestJsonData=objectMapper.readValue(x.getRequestData(),EmployeeRequestJsonData.class);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            EmployeeRequestResponse employeeRequestResponse=new EmployeeRequestResponse();
+
+            BeanUtils.copyProperties(employeeRequestJsonData,employeeRequestResponse);
+
+            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("api/v1/downloadFile/")
+                    .path(x.getFileName())
+                    .toUriString();
+            employeeRequestResponse.setAttachment(fileDownloadUri);
+            employeeRequestResponse.setRequestNo(x.getRequestNo());
+            employeeRequestResponse.setRequestDatetime(x.getRequestDateTime());
+            employeeRequestResponse.setStatus(x.getStatus());
+//            allList.add(modelMapper.map(x,EmployeeRequestResponse.class));
+
+            allList.add(employeeRequestResponse);
+        });
+
+        return allList;
+    }
+
+    public List<EmploymentBaseProj> getMyteamByEmpNo(String email){
+
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+        return employmentRepository.getMyTeam(employeeEntity);
+    }
+
+    public List<EmployeeNeedApproveResponse> getAllEmpRequestNeedApprove(String email){
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+
+        return employeeRequestRepository.getListEmpNeedApprove(employeeEntity);
+    }
+
+    public List<EmployeeNeedApproveResponse> getAllEmpRequestHistory(String email){
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+
+        return employeeRequestRepository.getListEmpHistory(employeeEntity);
+    }
+
 }

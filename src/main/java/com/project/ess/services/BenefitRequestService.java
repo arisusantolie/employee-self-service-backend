@@ -9,6 +9,7 @@ import com.project.ess.entity.EmployeeEntity;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithRequestNo;
 import com.project.ess.model.BenefitBalanceResponse;
+import com.project.ess.model.BenefitNeedApproveResponse;
 import com.project.ess.model.BenefitRequestResponse;
 import com.project.ess.model.UploadFileResponse;
 import com.project.ess.repository.BenefitBalanceRepository;
@@ -47,8 +48,11 @@ public class BenefitRequestService {
     EmployeeRepository employeeRepository;
 
     @Transactional
-    public ResponseEntity<CustomMessageWithRequestNo> createClaimBenefit(String benefitrequest, MultipartFile file){
+    public ResponseEntity<CustomMessageWithRequestNo> createClaimBenefit(String email,String benefitrequest, MultipartFile file){
 
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
 
         BenefitRequestDTO request=new BenefitRequestDTO();
 
@@ -59,7 +63,9 @@ public class BenefitRequestService {
             ex.printStackTrace();
         }
 
-        BenefitBalanceEntity existBenefitBalance=benefitBalanceRepository.findById(request.getBenefitBalanceId()).orElseThrow(
+
+
+        BenefitBalanceEntity existBenefitBalance=benefitBalanceRepository.findByEmployeeAndPeriod(employeeEntity,LocalDate.now().getYear()).orElseThrow(
                 ()->new CustomGenericException("This Benefit Doesn't Exist")
         );
 
@@ -108,5 +114,25 @@ public class BenefitRequestService {
         });
 
         return allListBenefit;
+    }
+
+    public List<BenefitNeedApproveResponse> getListBenefitRequestNeedApprove(String email){
+
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+
+        return benefitRequestRepository.getListBenefitNeedApprove(employeeEntity);
+    }
+
+    public List<BenefitNeedApproveResponse> getListBenefitHistoryRequest(String email){
+
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+
+        return benefitRequestRepository.getListBenefitHistory(employeeEntity);
     }
 }

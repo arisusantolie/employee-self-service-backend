@@ -1,5 +1,7 @@
 package com.project.ess.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.project.ess.entity.compositekey.AttempdailyId;
 import org.apache.tomcat.jni.Local;
 
@@ -11,12 +13,13 @@ import java.util.Objects;
 
 @Entity
 @IdClass(AttempdailyId.class)
-@Table(name ="attempdaily" )
+@Table(name ="attempdaily")
 public class AttempdailyEntity {
 
     @Id
     @ManyToOne
     @JoinColumn(name = "employee_no")
+    @JsonBackReference
     private EmployeeEntity employeeNo;
 
     @Id

@@ -7,8 +7,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Entity(name = "employeeRequest")
+@Entity()
 @IdClass(EmployeeRequestId.class)
+@Table(name = "employeeRequest")
 public class EmployeeRequestEntity {
 
     @Id
@@ -28,6 +29,15 @@ public class EmployeeRequestEntity {
     private Long approvedBy;
     private LocalDateTime approvedDatetime;
     private String fileName;
+    private String requestNo;
+
+    public String getRequestNo() {
+        return requestNo;
+    }
+
+    public void setRequestNo(String requestNo) {
+        this.requestNo = requestNo;
+    }
 
     public String getFileName() {
         return fileName;

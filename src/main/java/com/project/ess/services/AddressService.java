@@ -9,6 +9,7 @@ import com.project.ess.entity.EmployeeEntity;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.execptions.ErrorMessage;
+import com.project.ess.model.AddressNeedApproveResponse;
 import com.project.ess.model.AddressResponse;
 import com.project.ess.model.UploadFileResponse;
 import com.project.ess.model.jsondata.AddressRequestJsonData;
@@ -24,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -82,6 +84,17 @@ public class AddressService {
         addressRepository.save(addressEntity);
 
         AddressRequestJsonData addressRequestJsonData=new AddressRequestJsonData();
+
+        addressRequestJsonData.setNewAdddress(request.getAddress());
+        addressRequestJsonData.setNewCity(request.getCity());
+        addressRequestJsonData.setNewCountry(request.getCountry());
+        addressRequestJsonData.setNewPrimaryFlag(request.getPrimaryFlag());
+        addressRequestJsonData.setNewProvince(request.getProvince());
+        addressRequestJsonData.setNewStayStatus(request.getStayStatus());
+        addressRequestJsonData.setNewType(request.getType());
+        addressRequestJsonData.setNewZipCode(request.getZipCode());
+
+
         AddressRequestEntity addressRequestEntity=new AddressRequestEntity();
 
         addressRequestEntity.setAddressId(addressEntity);
@@ -93,7 +106,7 @@ public class AddressService {
 
         addressRequestEntity.setAttachmentPath(uploadFileResponse.getAttachment());
         addressRequestEntity.setFileName(uploadFileResponse.getFileName());
-
+        addressRequestEntity.setRequestNo("ADDRESS/REQ/"+ LocalDate.now() +"/"+addressEntity.getAddressId());
         addressRequestRepository.save(addressRequestEntity);
 
         AddressResponse returnValue=new AddressResponse();
@@ -145,7 +158,7 @@ public class AddressService {
 
         addressRequestEntity.setAttachmentPath(uploadFileResponse.getAttachment());
         addressRequestEntity.setFileName(uploadFileResponse.getFileName());
-
+        addressRequestEntity.setRequestNo("ADDRESS/REQ/"+ LocalDate.now() +"/"+addressEntity.getAddressId());
 //        System.out.println(addressRequestJsonData.toString());
 
         addressRequestRepository.save(addressRequestEntity);
@@ -185,5 +198,21 @@ public class AddressService {
         );
 
         return allList;
+    }
+
+    public List<AddressNeedApproveResponse> getListAddreesNeedApprove(String email){
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+        return addressRequestRepository.getListAddressNeedApprove(employeeEntity);
+    }
+
+    public List<AddressNeedApproveResponse> getListAddreesHistory(String email){
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+        return addressRequestRepository.getListAddressHistory(employeeEntity);
     }
 }

@@ -8,6 +8,7 @@ import com.project.ess.entity.AbsenceEntity;
 import com.project.ess.entity.EmployeeEntity;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithRequestNo;
+import com.project.ess.model.AbsenceNeedApproveResponse;
 import com.project.ess.model.AbsenceResponse;
 import com.project.ess.model.AddressResponse;
 import com.project.ess.model.UploadFileResponse;
@@ -98,5 +99,23 @@ public class AbsenceService {
         BeanUtils.copyProperties(absenceEntityList,allList);
 
         return allList;
+    }
+
+    public List<AbsenceNeedApproveResponse> getListNeedApprove(String email){
+
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+        return absenceRepository.getListAbsenceNeedApprove(employeeEntity.getEmployeeNo());
+    }
+
+    public List<AbsenceNeedApproveResponse> getListHistoryAbsence(String email){
+
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+        return absenceRepository.getListHistoryAbsence(employeeEntity.getEmployeeNo());
     }
 }

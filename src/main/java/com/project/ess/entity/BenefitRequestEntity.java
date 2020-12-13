@@ -1,5 +1,6 @@
 package com.project.ess.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.project.ess.entity.compositekey.BenefitRequestId;
 
 import javax.persistence.*;
@@ -7,13 +8,15 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Entity(name = "benefitRequest")
+@Entity()
 @IdClass(BenefitRequestId.class)
+@Table(name = "benefitRequest")
 public class BenefitRequestEntity {
 
     @Id
     @ManyToOne
     @JoinColumn(name = "benefit_balance_id")
+    @JsonBackReference
     private BenefitBalanceEntity benefitBalanceId;
 
     @Id

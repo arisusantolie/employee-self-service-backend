@@ -4,7 +4,8 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Entity(name = "benefitBalance")
+@Entity()
+@Table(name = "benefitBalance")
 public class BenefitBalanceEntity {
 
     @Id

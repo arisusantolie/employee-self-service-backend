@@ -1,5 +1,6 @@
 package com.project.ess.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.ess.entity.compositekey.AbsenceId;
 
@@ -7,13 +8,15 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Entity(name = "absence")
+@Entity()
 @IdClass(AbsenceId.class)
+@Table(name = "absence")
 public class AbsenceEntity {
 
     @Id
     @ManyToOne
     @JoinColumn(name = "employee_no")
+    @JsonBackReference
     private EmployeeEntity employeeNo;
 
     @Id

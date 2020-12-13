@@ -8,6 +8,7 @@ import com.project.ess.entity.FamilyEntity;
 import com.project.ess.entity.FamilyRequestEntity;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
+import com.project.ess.model.FamilyNeedApproveResponse;
 import com.project.ess.model.FamilyResponse;
 import com.project.ess.model.UploadFileResponse;
 import com.project.ess.model.jsondata.FamilyRequestJsonData;
@@ -117,6 +118,7 @@ public class FamilyService {
 
         familyRequestEntity.setAttachmentPath(uploadFileResponse.getAttachment());
         familyRequestEntity.setFileName(uploadFileResponse.getFileName());
+        familyRequestEntity.setRequestNo("FAMILY/REQ/"+LocalDate.now()+"/"+familyEntity.getFamilyId());
 
         familyRequestRepository.save(familyRequestEntity);
 
@@ -161,5 +163,23 @@ public class FamilyService {
 
         return listFamily;
 
+    }
+
+    public List<FamilyNeedApproveResponse> getListFamNeedApprove(String email){
+
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+        return familyRequestRepository.getListFamilyNeedApprove(employeeEntity);
+    }
+
+    public List<FamilyNeedApproveResponse> getHistoryFamRequest(String email){
+
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+        return familyRequestRepository.getListHistoryFamilyRequest(employeeEntity);
     }
 }
