@@ -25,19 +25,19 @@ public class AbsenceController {
         return absenceService.addAbsence(absence,file,authentication.getName());
     }
 
-    @GetMapping
+    @GetMapping("/request")
     public List<AbsenceResponse> getAllAbsence(Authentication authentication){
 
         return absenceService.getDataAbsence(authentication.getName());
     }
 
-    @GetMapping("/needapprove")
+    @GetMapping("/request/needapprove")
     public List<AbsenceNeedApproveResponse> getListEmpAbsenceNeedApprove(Authentication authentication){
 
         return absenceService.getListNeedApprove(authentication.getName());
     }
 
-    @GetMapping("/history")
+    @GetMapping("/request/history")
     public List<AbsenceNeedApproveResponse> getListHistoryAbsenceReq(Authentication authentication){
 
         return absenceService.getListHistoryAbsence(authentication.getName());

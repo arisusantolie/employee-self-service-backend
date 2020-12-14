@@ -36,24 +36,24 @@ public class AttempdailyController {
         return attempdailyService.checkInNow(request,authentication.getName());
     }
 
-    @GetMapping
+    @GetMapping("/request")
     public List<AttempdailyEntity> getListAttempEmp(Authentication authentication){
 
         return attempdailyService.getListByEmp(authentication.getName());
     }
 
-    @GetMapping("/timesheet")
+    @GetMapping("/request/timesheet")
     public List<AttempdailyEntity> getTimeshett(){
 
         return attempdailyRepository.getTimeSheet(12,2020);
     }
 
-    @GetMapping("/needapprove")
+    @GetMapping("/request/needapprove")
     public List<AttempdailyNeedResponse> getListCheckInCheckOutNeedApprove(Authentication authentication){
         return attempdailyService.getListCheckInCheckOutNeedApprove(authentication.getName());
     }
 
-    @GetMapping("/history")
+    @GetMapping("/request/history")
     public List<AttempdailyNeedResponse> getListCheckInCheckOutHistory(Authentication authentication){
         return attempdailyService.getListCheckInCheckOutHistory(authentication.getName());
     }

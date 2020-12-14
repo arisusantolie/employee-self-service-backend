@@ -27,6 +27,26 @@ public class UserEntity implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "roles_id",referencedColumnName = "id"))
     private Collection<RoleEntity> roles;
 
+
+    private String profilePicture;
+    private String fileName;
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
     public Collection<RoleEntity> getRoles() {
         return roles;
     }
