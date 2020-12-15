@@ -1,5 +1,6 @@
 package com.project.ess.security;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ess.SpringApplicationContext;
 import com.project.ess.dto.EmployeeDTO;
@@ -43,8 +44,10 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+
         try{
             UserLoginDTO credentials=new ObjectMapper().readValue(request.getInputStream(),UserLoginDTO.class);
+            System.out.println(credentials.getEmail());
             return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(credentials.getEmail(),credentials.getPassword(),new ArrayList<>()));
         }catch (IOException ex){
             ex.printStackTrace();
