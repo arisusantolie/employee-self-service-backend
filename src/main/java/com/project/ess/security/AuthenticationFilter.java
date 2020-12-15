@@ -6,6 +6,7 @@ import com.project.ess.SpringApplicationContext;
 import com.project.ess.dto.EmployeeDTO;
 import com.project.ess.dto.UserLoginDTO;
 import com.project.ess.entity.EmployeeEntity;
+import com.project.ess.execptions.ErrorMessage;
 import com.project.ess.services.EmployeeService;
 import com.project.ess.services.UserService;
 import io.jsonwebtoken.Claims;
@@ -24,6 +25,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Optional;
@@ -78,19 +80,27 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         EmployeeEntity empEntity=employeeService.findByEmail(userName).get();
 
         response.addHeader(SecurityConstants.getHeaderString(),SecurityConstants.getTokenPrefix()+token);
-
-        response.addHeader("employeeNo",String.valueOf(empEntity.getEmployeeNo()));
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(
+                "{\"" + SecurityConstants.getHeaderString() + "\":\"" + SecurityConstants.getTokenPrefix()+token + "\"," +
+                        "\"employeeNo\" : \""+empEntity.getEmployeeNo()+"\"}"
+        );
+//        response.addHeader("employeeNo",String.valueOf(empEntity.getEmployeeNo()));
 
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
 
+        ErrorMessage errorMessage=new ErrorMessage(new Date(),"unAuthroize",true);
+
+
         ObjectMapper mapper = new ObjectMapper();
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(mapper.writeValueAsString("unAuthorized"));
+        response.getWriter().write(errorMessage.toString());
 
     }
 }
