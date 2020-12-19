@@ -7,14 +7,14 @@ import java.util.Objects;
 public class AddressRequestId implements Serializable {
 
     private Long addressId;
-    private LocalDateTime requestDateTime;
+    private String requestNo;
 
     public AddressRequestId() {
     }
 
-    public AddressRequestId(Long addressId, LocalDateTime requestDateTime) {
+    public AddressRequestId(Long addressId, String requestNo) {
         this.addressId = addressId;
-        this.requestDateTime = requestDateTime;
+        this.requestNo = requestNo;
     }
 
     public Long getAddressId() {
@@ -25,12 +25,13 @@ public class AddressRequestId implements Serializable {
         this.addressId = addressId;
     }
 
-    public LocalDateTime getRequestDateTime() {
-        return requestDateTime;
+
+    public String getRequestNo() {
+        return requestNo;
     }
 
-    public void setRequestDateTime(LocalDateTime requestDateTime) {
-        this.requestDateTime = requestDateTime;
+    public void setRequestNo(String requestNo) {
+        this.requestNo = requestNo;
     }
 
     @Override
@@ -39,11 +40,11 @@ public class AddressRequestId implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         AddressRequestId that = (AddressRequestId) o;
         return Objects.equals(addressId, that.addressId) &&
-                Objects.equals(requestDateTime, that.requestDateTime);
+                Objects.equals(requestNo, that.requestNo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(addressId, requestDateTime);
+        return Objects.hash(addressId, requestNo);
     }
 }

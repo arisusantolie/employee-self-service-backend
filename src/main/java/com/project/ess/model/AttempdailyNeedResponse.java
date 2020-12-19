@@ -8,12 +8,32 @@ public class AttempdailyNeedResponse {
     Long employeeNo;
     String employeeName;
     String requestNo;
+    String status;
+    String remark;
 
-    public AttempdailyNeedResponse(AttempdailyEntity attempdailyEntity, Long employeeNo, String employeeName, String requestNo) {
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public AttempdailyNeedResponse(AttempdailyEntity attempdailyEntity, Long employeeNo, String employeeName, String requestNo, String status, String remark) {
         this.attempdailyEntity = attempdailyEntity;
         this.employeeNo = employeeNo;
         this.employeeName = employeeName;
         this.requestNo = requestNo;
+        this.status = status;
+        this.remark = remark;
     }
 
     public AttempdailyEntity getAttempdailyEntity() {

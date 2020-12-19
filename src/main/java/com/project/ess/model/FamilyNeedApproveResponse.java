@@ -16,7 +16,6 @@ public class FamilyNeedApproveResponse {
     private String requestData;
     private String status;
 
-    private Long approvedBy;
     private LocalDateTime approvedDatetime;
     private String fileName;
     private String requestNo;
@@ -24,7 +23,7 @@ public class FamilyNeedApproveResponse {
     Long employeeNo;
     String employeeName;
 
-    public FamilyNeedApproveResponse(Long familyId, LocalDateTime requestDateTime, String attachmentPath, String requestData, String status, Long approvedBy, LocalDateTime approvedDatetime, String fileName, String requestNo, Long employeeNo, String employeeName) throws JsonProcessingException {
+    public FamilyNeedApproveResponse(Long familyId, LocalDateTime requestDateTime, String attachmentPath, String requestData, String status, LocalDateTime approvedDatetime, String fileName, String requestNo, Long employeeNo, String employeeName) throws JsonProcessingException {
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("api/v1/downloadFile/")
                 .path(fileName)
@@ -36,7 +35,6 @@ public class FamilyNeedApproveResponse {
         this.requestDateTime = requestDateTime;
         this.attachmentPath = fileDownloadUri;
         this.status = status;
-        this.approvedBy = approvedBy;
         this.approvedDatetime = approvedDatetime;
         this.fileName = fileName;
         this.requestNo = requestNo;
@@ -81,13 +79,6 @@ public class FamilyNeedApproveResponse {
         this.status = status;
     }
 
-    public Long getApprovedBy() {
-        return approvedBy;
-    }
-
-    public void setApprovedBy(Long approvedBy) {
-        this.approvedBy = approvedBy;
-    }
 
     public LocalDateTime getApprovedDatetime() {
         return approvedDatetime;

@@ -8,7 +8,7 @@ import java.util.Objects;
 public class EmployeeRequestId implements Serializable {
 
     private Long employeeNo;
-    private LocalDateTime requestDateTime;
+    private String requestNo;
 
     public Long getEmployeeNo() {
         return employeeNo;
@@ -18,17 +18,18 @@ public class EmployeeRequestId implements Serializable {
         this.employeeNo = employeeNo;
     }
 
-    public LocalDateTime getRequestDateTime() {
-        return requestDateTime;
-    }
 
-    public void setRequestDateTime(LocalDateTime requestDateTime) {
-        this.requestDateTime = requestDateTime;
-    }
-
-    public EmployeeRequestId(Long employeeNo, LocalDateTime requestDateTime) {
+    public EmployeeRequestId(Long employeeNo, String requestNo) {
         this.employeeNo = employeeNo;
-        this.requestDateTime = requestDateTime;
+        this.requestNo = requestNo;
+    }
+
+    public String getRequestNo() {
+        return requestNo;
+    }
+
+    public void setRequestNo(String requestNo) {
+        this.requestNo = requestNo;
     }
 
     public EmployeeRequestId() {
@@ -40,11 +41,11 @@ public class EmployeeRequestId implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         EmployeeRequestId that = (EmployeeRequestId) o;
         return Objects.equals(employeeNo, that.employeeNo) &&
-                Objects.equals(requestDateTime, that.requestDateTime);
+                Objects.equals(requestNo, that.requestNo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(employeeNo, requestDateTime);
+        return Objects.hash(employeeNo, requestNo);
     }
 }

@@ -6,6 +6,7 @@ import com.project.ess.dto.AddressRequestDTO;
 import com.project.ess.dto.EmployeeDTO;
 import com.project.ess.dto.EmployeeRequestDTO;
 import com.project.ess.entity.*;
+import com.project.ess.entity.approval.EmployeeRequestStatus;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.model.EmployeeNeedApproveResponse;
@@ -15,10 +16,7 @@ import com.project.ess.model.UploadFileResponse;
 import com.project.ess.model.jsondata.AddressRequestJsonData;
 import com.project.ess.model.jsondata.EmployeeRequestJsonData;
 import com.project.ess.projection.EmploymentBaseProj;
-import com.project.ess.repository.EmployeeRepository;
-import com.project.ess.repository.EmployeeRequestRepository;
-import com.project.ess.repository.EmploymentRepository;
-import com.project.ess.repository.UserRepository;
+import com.project.ess.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +31,7 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -57,6 +56,9 @@ public class EmployeeService {
 
     @Autowired
     EmploymentRepository employmentRepository;
+
+    @Autowired
+    EmployeeRequestStatusRepository employeeRequestStatusRepository;
 
     @Transactional
     public EmployeeResponse createEmployee(EmployeeDTO request){
@@ -112,7 +114,7 @@ public class EmployeeService {
 
 
         employeeRequestEntity.setEmployeeNo(employeeEntity);
-        employeeRequestEntity.setStatus("PENDING");
+//
         employeeRequestEntity.setRequestDateTime(LocalDateTime.now());
         UploadFileResponse uploadFileResponse=uploadFileService.storeFile(file);
 
@@ -141,7 +143,12 @@ public class EmployeeService {
 
 
         employeeRequestEntity.setRequestData(employeeRequestJsonData.toString());
-        employeeRequestEntity.setRequestNo("EMPREQ/"+LocalDate.now()+"/"+employeeEntity.getEmployeeNo());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd/HH:mm:ss");
+
+        String formatDateTime = LocalDateTime.now().format(formatter);
+
+        employeeRequestEntity.setRequestNo("EMPREQ/"+formatDateTime+"/"+employeeEntity.getEmployeeNo());
 
 
 
@@ -149,7 +156,10 @@ public class EmployeeService {
 
 
         employeeRequestRepository.save(employeeRequestEntity);
-
+        EmployeeRequestStatus employeeRequestStatus=new EmployeeRequestStatus();
+        employeeRequestStatus.setStatus("PENDING");
+        employeeRequestStatus.setEmployeeRequestEntity(employeeRequestEntity);
+        employeeRequestStatusRepository.save(employeeRequestStatus);
  
 
         BeanUtils.copyProperties(request,employeeEntity);
@@ -169,34 +179,35 @@ public class EmployeeService {
                 ()->  new CustomGenericException("This Employee Doesnt Exist")
         );
 
-        List<EmployeeRequestResponse> allList=new ArrayList<>();
 
-        ObjectMapper objectMapper=new ObjectMapper();
-        employeeRequestRepository.findByEmployeeNoOrderByRequestDateTime(employeeEntity).forEach(x->{
+        List<EmployeeRequestResponse> allList= employeeRequestRepository.findData(employeeEntity);
 
 
-            EmployeeRequestJsonData employeeRequestJsonData=new EmployeeRequestJsonData();
-            try {
-                employeeRequestJsonData=objectMapper.readValue(x.getRequestData(),EmployeeRequestJsonData.class);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-            EmployeeRequestResponse employeeRequestResponse=new EmployeeRequestResponse();
-
-            BeanUtils.copyProperties(employeeRequestJsonData,employeeRequestResponse);
-
-            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("api/v1/downloadFile/")
-                    .path(x.getFileName())
-                    .toUriString();
-            employeeRequestResponse.setAttachment(fileDownloadUri);
-            employeeRequestResponse.setRequestNo(x.getRequestNo());
-            employeeRequestResponse.setRequestDatetime(x.getRequestDateTime());
-            employeeRequestResponse.setStatus(x.getStatus());
-//            allList.add(modelMapper.map(x,EmployeeRequestResponse.class));
-
-            allList.add(employeeRequestResponse);
-        });
+//       .forEach(x->{
+//
+//
+//            EmployeeRequestJsonData employeeRequestJsonData=new EmployeeRequestJsonData();
+//            try {
+//                employeeRequestJsonData=objectMapper.readValue(x.getRequestData(),EmployeeRequestJsonData.class);
+//            } catch (JsonProcessingException e) {
+//                e.printStackTrace();
+//            }
+//            EmployeeRequestResponse employeeRequestResponse=new EmployeeRequestResponse();
+//
+//            BeanUtils.copyProperties(employeeRequestJsonData,employeeRequestResponse);
+//
+//            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+//                    .path("api/v1/downloadFile/")
+//                    .path(x.getFileName())
+//                    .toUriString();
+//            employeeRequestResponse.setAttachment(fileDownloadUri);
+//            employeeRequestResponse.setRequestNo(x.getRequestNo());
+//            employeeRequestResponse.setRequestDatetime(x.getRequestDateTime());
+//            employeeRequestResponse.setStatus(x.());
+////            allList.add(modelMapper.map(x,EmployeeRequestResponse.class));
+//
+//            allList.add(employeeRequestResponse);
+//        });
 
         return allList;
     }
@@ -215,7 +226,7 @@ public class EmployeeService {
         );
 
 
-        return employeeRequestRepository.getListEmpNeedApprove(employeeEntity);
+        return employeeRequestRepository.getListEmpNeedApprove();
     }
 
     public List<EmployeeNeedApproveResponse> getAllEmpRequestHistory(String email){

@@ -15,7 +15,7 @@ public class AbsenceResponse {
     private String type;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime requestDatetime;
-    private Long approvedBy;
+    private Long managerId;
     private String status;
     private String attachment;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
@@ -71,12 +71,12 @@ public class AbsenceResponse {
         this.requestDatetime = requestDatetime;
     }
 
-    public Long getApprovedBy() {
-        return approvedBy;
+    public Long getManagerId() {
+        return managerId;
     }
 
-    public void setApprovedBy(Long approvedBy) {
-        this.approvedBy = approvedBy;
+    public void setManagerId(Long managerId) {
+        this.managerId = managerId;
     }
 
     public String getStatus() {

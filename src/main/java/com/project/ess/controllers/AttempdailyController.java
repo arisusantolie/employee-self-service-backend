@@ -41,19 +41,19 @@ public class AttempdailyController {
 
         return attempdailyService.getListByEmp(authentication.getName());
     }
-
-    @GetMapping("/request/timesheet")
-    public List<AttempdailyEntity> getTimeshett(){
-
-        return attempdailyRepository.getTimeSheet(12,2020);
-    }
-
+//
+//    @GetMapping("/request/timesheet")
+//    public List<AttempdailyEntity> getTimeshett(){
+//
+//        return attempdailyRepository.getTimeSheet(12,2020);
+//    }
+//
     @GetMapping("/request/needapprove")
     public List<AttempdailyNeedResponse> getListCheckInCheckOutNeedApprove(Authentication authentication){
         return attempdailyService.getListCheckInCheckOutNeedApprove(authentication.getName());
     }
 
-    @GetMapping("/request/history")
+    @GetMapping("/request/history") //untuk manager
     public List<AttempdailyNeedResponse> getListCheckInCheckOutHistory(Authentication authentication){
         return attempdailyService.getListCheckInCheckOutHistory(authentication.getName());
     }

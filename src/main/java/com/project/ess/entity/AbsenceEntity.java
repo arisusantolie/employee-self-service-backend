@@ -2,16 +2,19 @@ package com.project.ess.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.project.ess.entity.approval.AbsenceStatus;
 import com.project.ess.entity.compositekey.AbsenceId;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity()
 @IdClass(AbsenceId.class)
 @Table(name = "absence")
-public class AbsenceEntity {
+public class AbsenceEntity implements Serializable {
 
     @Id
     @ManyToOne
@@ -19,11 +22,13 @@ public class AbsenceEntity {
     @JsonBackReference
     private EmployeeEntity employeeNo;
 
-    @Id
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime requestDateTime;
 
+    @Id
     private String requestNo;
+
     private int amount;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -33,12 +38,9 @@ public class AbsenceEntity {
     private LocalDate endDate;
     private String remark;
     private String type;
-    private String status;
-    private String attachment;
-    private Long approvedBy;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    private LocalDate approvedDatetime;
+    private String attachment;
+
     private String fileName;
 
     public String getFileName() {
@@ -57,29 +59,6 @@ public class AbsenceEntity {
         this.attachment = attachment;
     }
 
-    public Long getApprovedBy() {
-        return approvedBy;
-    }
-
-    public void setApprovedBy(Long approvedBy) {
-        this.approvedBy = approvedBy;
-    }
-
-    public LocalDate getApprovedDatetime() {
-        return approvedDatetime;
-    }
-
-    public void setApprovedDatetime(LocalDate approvedDatetime) {
-        this.approvedDatetime = approvedDatetime;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
     public EmployeeEntity getEmployeeNo() {
         return employeeNo;

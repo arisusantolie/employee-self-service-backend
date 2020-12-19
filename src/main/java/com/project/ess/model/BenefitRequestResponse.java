@@ -1,6 +1,7 @@
 package com.project.ess.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.LocalDateTime;
 
@@ -13,8 +14,26 @@ public class BenefitRequestResponse {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime approvedDatetime;
     private String requestNo;
-    private Long approvedBy;
+    private Long managerId;
     private Long benefitPlanId;
+    private String benefitPlanName;
+    private String managerName;
+
+    public String getBenefitPlanName() {
+        return benefitPlanName;
+    }
+
+    public void setBenefitPlanName(String benefitPlanName) {
+        this.benefitPlanName = benefitPlanName;
+    }
+
+    public String getManagerName() {
+        return managerName;
+    }
+
+    public void setManagerName(String managerName) {
+        this.managerName = managerName;
+    }
 
     public String getStatus() {
         return status;
@@ -56,12 +75,30 @@ public class BenefitRequestResponse {
         this.requestNo = requestNo;
     }
 
-    public Long getApprovedBy() {
-        return approvedBy;
+    public BenefitRequestResponse(String status, String attachment, LocalDateTime requestDateTime, LocalDateTime approvedDatetime, String requestNo, Long managerId, Long benefitPlanId,String benefitPlanName, String managerName) {
+
+        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("api/v1/downloadFile/")
+                .path(attachment)
+                .toUriString();
+
+        this.status = status;
+        this.attachment = fileDownloadUri;
+        this.requestDateTime = requestDateTime;
+        this.approvedDatetime = approvedDatetime;
+        this.requestNo = requestNo;
+        this.managerId = managerId;
+        this.benefitPlanId = benefitPlanId;
+        this.managerName = managerName;
+        this.benefitPlanName=benefitPlanName;
     }
 
-    public void setApprovedBy(Long approvedBy) {
-        this.approvedBy = approvedBy;
+    public Long getManagerId() {
+        return managerId;
+    }
+
+    public void setManagerId(Long managerId) {
+        this.managerId = managerId;
     }
 
     public Long getBenefitPlanId() {

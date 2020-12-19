@@ -22,7 +22,7 @@ public class AttempdailyEntity {
     @JsonBackReference
     private EmployeeEntity employeeNo;
 
-    @Id
+
     private LocalDateTime actualTime;
 
     private String type;
@@ -33,37 +33,15 @@ public class AttempdailyEntity {
     @Column(nullable = false,precision=11, scale=8)
     private BigDecimal actual_lat;
 
+    @Id
     private String requestNo;
+
     private Boolean isOutOffice;
     private String purpose;
     private String remark;
-    private String status;
-    private Long approvedBy;
-    private LocalDateTime approvedDatetime;
 
-    public String getStatus() {
-        return status;
-    }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
-    public Long getApprovedBy() {
-        return approvedBy;
-    }
-
-    public void setApprovedBy(Long approvedBy) {
-        this.approvedBy = approvedBy;
-    }
-
-    public LocalDateTime getApprovedDatetime() {
-        return approvedDatetime;
-    }
-
-    public void setApprovedDatetime(LocalDateTime approvedDatetime) {
-        this.approvedDatetime = approvedDatetime;
-    }
 
     public EmployeeEntity getEmployeeNo() {
         return employeeNo;

@@ -20,9 +20,8 @@ public class AddressRequestController {
     @Autowired
     AddressService addressService;
 
-    @PostMapping
+    @PostMapping("edit")
     public ResponseEntity<CustomMessageWithId> addRequestUpdate(@RequestParam("address") String address,@RequestParam("file") MultipartFile file){
-
 
         return addressService.createRequest(address,file);
     }
@@ -33,7 +32,7 @@ public class AddressRequestController {
         return addressService.getListAddreesNeedApprove(authentication.getName());
     }
 
-    @GetMapping("/history")
+    @GetMapping("/history") //untuk history approval untuk admin, bukan employee biasa
     public List<AddressNeedApproveResponse> getListAddressHistory(Authentication authentication){
         return addressService.getListAddreesHistory(authentication.getName());
     }

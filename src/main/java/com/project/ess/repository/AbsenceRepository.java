@@ -14,11 +14,17 @@ public interface AbsenceRepository extends JpaRepository<AbsenceEntity, Long> {
 
     public List<AbsenceEntity> findByEmployeeNoOrderByRequestDateTimeDesc(EmployeeEntity employeeNo);
 
-    @Query("select new com.project.ess.model.AbsenceNeedApproveResponse(ab,emp.employee.employeeNo,concat(emp.employee.firstName,' ',emp.employee.lastName),ab.requestNo) from AbsenceEntity ab,EmploymentEntity emp where ab.employeeNo=emp.employee " +
-            "  and current_date>=emp.startDate and current_date<=emp.endDate and emp.employeeDirectToId.employeeNo=:employee and ab.status='PENDING' order by ab.requestDateTime asc")
-    public List<AbsenceNeedApproveResponse> getListAbsenceNeedApprove(@Param("employee")Long empNo);
+    @Query("select new com.project.ess.model.AbsenceNeedApproveResponse(ab,emp.employee.employeeNo,concat(emp.employee.firstName,' ',emp.employee.lastName),ab.requestNo,abstat.status) " +
+            "from AbsenceEntity ab,AbsenceStatus abstat, " +
+            " EmploymentEntity emp,DivisiEntity de,ManagerEntity me where ab.employeeNo=emp.employee " +
+            "  and current_date>=emp.startDate and current_date<=emp.endDate and ab=abstat.absenceEntity and emp.divisiEntity=de and me.divisiEntity=de" +
+            " and me.managerId=:managerId and abstat.status ='PENDING' order by ab.requestDateTime asc")
+    public List<AbsenceNeedApproveResponse> getListAbsenceNeedApprove(@Param("managerId")Long managerId);
 
-    @Query("select new com.project.ess.model.AbsenceNeedApproveResponse(ab,emp.employee.employeeNo,concat(emp.employee.firstName,' ',emp.employee.lastName),ab.requestNo) from AbsenceEntity ab,EmploymentEntity emp where ab.employeeNo=emp.employee " +
-            "  and current_date>=emp.startDate and current_date<=emp.endDate and emp.employeeDirectToId.employeeNo=:employee and ab.status!='PENDING' order by ab.requestDateTime asc")
-    public List<AbsenceNeedApproveResponse> getListHistoryAbsence(@Param("employee")Long empNo);
+    @Query("select new com.project.ess.model.AbsenceNeedApproveResponse(ab,emp.employee.employeeNo,concat(emp.employee.firstName,' ',emp.employee.lastName),ab.requestNo,abstat.status) " +
+            "from AbsenceEntity ab,AbsenceStatus abstat, " +
+            " EmploymentEntity emp,DivisiEntity de,ManagerEntity me where ab.employeeNo=emp.employee " +
+            "  and current_date>=emp.startDate and current_date<=emp.endDate and ab=abstat.absenceEntity and emp.divisiEntity=de and me.divisiEntity=de" +
+            " and me.managerId=:managerId and abstat.status !='PENDING' order by ab.requestDateTime asc")
+    public List<AbsenceNeedApproveResponse> getListHistoryAbsence(@Param("managerId")Long managerId);
 }

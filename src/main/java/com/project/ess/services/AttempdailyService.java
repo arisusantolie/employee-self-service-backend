@@ -3,12 +3,13 @@ package com.project.ess.services;
 import com.project.ess.dto.AttempdailyDTO;
 import com.project.ess.entity.AttempdailyEntity;
 import com.project.ess.entity.EmployeeEntity;
+import com.project.ess.entity.approval.AttempdailyStatus;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.execptions.CustomMessageWithRequestNo;
 import com.project.ess.model.AttempdailyNeedResponse;
-import com.project.ess.repository.AttempdailyRepository;
-import com.project.ess.repository.EmployeeRepository;
+import com.project.ess.projection.EmploymentBaseProj;
+import com.project.ess.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +30,15 @@ public class AttempdailyService {
     @Autowired
     AttempdailyRepository attempdailyRepository;
 
+    @Autowired
+    EmploymentRepository employmentRepository;
+
+    @Autowired
+    ManagerRepository managerRepository;
+
+    @Autowired
+    AttempdailyStatusRepository attempdailyStatusRepository;
+
     public ResponseEntity<CustomMessageWithRequestNo> checkInNow(AttempdailyDTO request,String email){
 
         EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
@@ -35,25 +46,41 @@ public class AttempdailyService {
         );
 
         if(attempdailyRepository.findByEmployeeNoAndActualTimeAndType(employeeEntity.getEmployeeNo(),request.getType(), LocalDateTime.now().toLocalDate()).isPresent()){
-            throw new CustomGenericException("You Have Been "+request.getType().toLowerCase()+" Today");
+            throw new CustomGenericException("You Have Been "+request.getType().substring(0,1).toUpperCase()+request.getType().substring(1).toLowerCase() +" Today");
         }
+
+        EmploymentBaseProj employmentBaseProj=employmentRepository.getEmployment(employeeEntity);
 
         AttempdailyEntity attempdailyEntity=new AttempdailyEntity();
 
         attempdailyEntity.setActual_lat(request.getActual_lat());
         attempdailyEntity.setActual_lng(request.getActual_lng());
-        attempdailyEntity.setStatus("PENDING");
+
         attempdailyEntity.setOutOffice(request.getOutOffice());
         attempdailyEntity.setPurpose(request.getPurpose());
         attempdailyEntity.setActualTime(LocalDateTime.now());
         attempdailyEntity.setRemark(request.getRemark());
         attempdailyEntity.setType(request.getType());
-        attempdailyEntity.setRequestNo(request.getType().toUpperCase()+"/"+ LocalDate.now()+"/"+employeeEntity.getEmployeeNo());
+
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd/HH:mm:ss");
+
+        String formatDateTime = LocalDateTime.now().format(formatter);
+
+        attempdailyEntity.setRequestNo(request.getType().toUpperCase()+"/"+ formatDateTime+"/"+employeeEntity.getEmployeeNo());
         attempdailyEntity.setEmployeeNo(employeeEntity);
 
         attempdailyRepository.save(attempdailyEntity);
 
-        return new ResponseEntity<CustomMessageWithRequestNo>(new CustomMessageWithRequestNo("Checkin Today Successfully",false,attempdailyEntity.getRequestNo()), HttpStatus.OK);
+        AttempdailyStatus attempdailyStatus=new AttempdailyStatus();
+
+        attempdailyStatus.setAttempdailyEntity(attempdailyEntity);
+        attempdailyStatus.setStatus("PENDING");
+        attempdailyStatus.setManagerId(managerRepository.findById(employmentBaseProj.getManagerId()).get());
+
+        attempdailyStatusRepository.save(attempdailyStatus);
+
+        return new ResponseEntity<CustomMessageWithRequestNo>(new CustomMessageWithRequestNo(request.getType().substring(0,1).toUpperCase()+request.getType().substring(1).toLowerCase() +" Today Successfully",false,attempdailyEntity.getRequestNo()), HttpStatus.OK);
 
 
     }

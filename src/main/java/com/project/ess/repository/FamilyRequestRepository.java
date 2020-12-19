@@ -13,16 +13,16 @@ public interface FamilyRequestRepository extends JpaRepository<FamilyRequestEnti
 
 
     @Query("select new com.project.ess.model.FamilyNeedApproveResponse(fam.familyId,famreq.requestDateTime,famreq.attachmentPath,famreq.requestData," +
-            "famreq.status,famreq.approvedBy,famreq.approvedDatetime,famreq.fileName,famreq.requestNo," +
-            "emp.employee.employeeNo,concat(emp.employee.firstName,' ',emp.employee.lastName) ) from FamilyEntity fam,FamilyRequestEntity famreq,EmploymentEntity emp " +
-            "where fam.familyId=famreq.familyId and fam.employee=emp.employee and famreq.status='PENDING' and current_date>=emp.startDate and current_date<=emp.endDate " +
-            "and emp.employeeDirectToId=:empManager order by famreq.requestDateTime asc")
+            "frs.status,frs.approvedDatetime,famreq.fileName,famreq.requestNo," +
+            "fam.employee.employeeNo,concat(fam.employee.firstName,' ',fam.employee.lastName) ) from FamilyEntity fam,FamilyRequestEntity famreq,FamilyRequestStatus frs " +
+            "where fam=famreq.familyId and famreq=frs.familyRequestEntity and frs.status='PENDING' " +
+            "order by famreq.requestDateTime asc")
     public List<FamilyNeedApproveResponse> getListFamilyNeedApprove(@Param("empManager")EmployeeEntity employeeEntity);
 
     @Query("select new com.project.ess.model.FamilyNeedApproveResponse(fam.familyId,famreq.requestDateTime,famreq.attachmentPath,famreq.requestData," +
-            "famreq.status,famreq.approvedBy,famreq.approvedDatetime,famreq.fileName,famreq.requestNo," +
-            "emp.employee.employeeNo,concat(emp.employee.firstName,' ',emp.employee.lastName) ) from FamilyEntity fam,FamilyRequestEntity famreq,EmploymentEntity emp " +
-            "where fam.familyId=famreq.familyId and fam.employee=emp.employee and famreq.status!='PENDING' and current_date>=emp.startDate and current_date<=emp.endDate " +
-            "and emp.employeeDirectToId=:empManager order by famreq.requestDateTime asc")
-    public List<FamilyNeedApproveResponse> getListHistoryFamilyRequest(@Param("empManager")EmployeeEntity employeeEntity);
+            "frs.status,frs.approvedDatetime,famreq.fileName,famreq.requestNo," +
+            "fam.employee.employeeNo,concat(fam.employee.firstName,' ',fam.employee.lastName) ) from FamilyEntity fam,FamilyRequestEntity famreq,FamilyRequestStatus frs " +
+            "where fam=famreq.familyId and famreq=frs.familyRequestEntity and frs.hraId.employeeEntity=:employee and frs.status!='PENDING' " +
+            "order by frs.approvedDatetime desc")
+    public List<FamilyNeedApproveResponse> getListHistoryFamilyRequest(@Param("employee")EmployeeEntity employeeEntity);
 }

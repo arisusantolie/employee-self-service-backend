@@ -17,7 +17,7 @@ public class EmployeeRequestEntity {
     @JoinColumn(name = "employeeNo")
     private EmployeeEntity employeeNo;
 
-    @Id
+
     private LocalDateTime requestDateTime;
 
     private String attachment;
@@ -25,10 +25,9 @@ public class EmployeeRequestEntity {
     @Lob
     @Column(length = 512)
     private String requestData;
-    private String status;
-    private Long approvedBy;
-    private LocalDateTime approvedDatetime;
     private String fileName;
+
+    @Id
     private String requestNo;
 
     public String getRequestNo() {
@@ -47,29 +46,7 @@ public class EmployeeRequestEntity {
         this.fileName = fileName;
     }
 
-    public String getStatus() {
-        return status;
-    }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Long getApprovedBy() {
-        return approvedBy;
-    }
-
-    public void setApprovedBy(Long approvedBy) {
-        this.approvedBy = approvedBy;
-    }
-
-    public LocalDateTime getApprovedDatetime() {
-        return approvedDatetime;
-    }
-
-    public void setApprovedDatetime(LocalDateTime approvedDatetime) {
-        this.approvedDatetime = approvedDatetime;
-    }
 
     public EmployeeEntity getEmployeeNo() {
         return employeeNo;

@@ -5,9 +5,8 @@ import java.time.LocalDate;
 public class EmploymentDTO {
 
     private Long employeeNo;
-    private Long employeeDirectToId;
 
-    private String department;
+    private Long divisiId;
 
     private String position;
 
@@ -24,20 +23,15 @@ public class EmploymentDTO {
         this.employeeNo = employeeNo;
     }
 
-    public Long getEmployeeDirectToId() {
-        return employeeDirectToId;
+
+
+
+    public Long getDivisiId() {
+        return divisiId;
     }
 
-    public void setEmployeeDirectToId(Long employeeDirectToId) {
-        this.employeeDirectToId = employeeDirectToId;
-    }
-
-    public String getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(String department) {
-        this.department = department;
+    public void setDivisiId(Long divisiId) {
+        this.divisiId = divisiId;
     }
 
     public String getPosition() {

@@ -16,7 +16,7 @@ public class AddressRequestEntity {
     @JoinColumn(name = "address_id")
     private AddressEntity addressId;
 
-    @Id
+
     private LocalDateTime requestDateTime;
 
 
@@ -26,10 +26,10 @@ public class AddressRequestEntity {
     @Lob
     @Column(columnDefinition = "json",length = 512)
     private String requestData;
-    private String status;
-    private Long approvedBy;
-    private LocalDateTime approvedDatetime;
+
     private String fileName;
+
+    @Id
     private String requestNo;
 
     public String getRequestNo() {
@@ -48,21 +48,7 @@ public class AddressRequestEntity {
         this.fileName = fileName;
     }
 
-    public Long getApprovedBy() {
-        return approvedBy;
-    }
 
-    public void setApprovedBy(Long approvedBy) {
-        this.approvedBy = approvedBy;
-    }
-
-    public LocalDateTime getApprovedDatetime() {
-        return approvedDatetime;
-    }
-
-    public void setApprovedDatetime(LocalDateTime approvedDatetime) {
-        this.approvedDatetime = approvedDatetime;
-    }
 
     public AddressEntity getAddressId() {
         return addressId;
@@ -94,14 +80,6 @@ public class AddressRequestEntity {
 
     public void setRequestData(String requestData) {
         this.requestData = requestData;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
 

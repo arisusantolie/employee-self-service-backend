@@ -33,11 +33,11 @@ public class BenefitRequestController {
 
     @GetMapping("/needapprove")
     public List<BenefitNeedApproveResponse> getListBenefitRequestNeedApprove(Authentication authentication){
-
+        System.out.println("masuk");
         return benefitRequestService.getListBenefitRequestNeedApprove(authentication.getName());
     }
 
-    @GetMapping("/history")
+    @GetMapping("/history") //untuk manager
     public List<BenefitNeedApproveResponse> getListHistoryBenefitRequest(Authentication authentication){
 
         return benefitRequestService.getListBenefitHistoryRequest(authentication.getName());

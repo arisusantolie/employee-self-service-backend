@@ -6,15 +6,15 @@ import com.project.ess.dto.BenefitRequestDTO;
 import com.project.ess.entity.BenefitBalanceEntity;
 import com.project.ess.entity.BenefitRequestEntity;
 import com.project.ess.entity.EmployeeEntity;
+import com.project.ess.entity.approval.BenefitRequestStatus;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithRequestNo;
 import com.project.ess.model.BenefitBalanceResponse;
 import com.project.ess.model.BenefitNeedApproveResponse;
 import com.project.ess.model.BenefitRequestResponse;
 import com.project.ess.model.UploadFileResponse;
-import com.project.ess.repository.BenefitBalanceRepository;
-import com.project.ess.repository.BenefitRequestRepository;
-import com.project.ess.repository.EmployeeRepository;
+import com.project.ess.projection.EmploymentBaseProj;
+import com.project.ess.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +28,7 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,12 +48,25 @@ public class BenefitRequestService {
     @Autowired
     EmployeeRepository employeeRepository;
 
+
+    @Autowired
+    EmploymentRepository employmentRepository;
+
+    @Autowired
+    ManagerRepository managerRepository;
+
+    @Autowired
+    BenefitRequestStatusRepository benefitRequestStatusRepository;
+
+
     @Transactional
     public ResponseEntity<CustomMessageWithRequestNo> createClaimBenefit(String email,String benefitrequest, MultipartFile file){
 
         EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
                 ()->  new CustomGenericException("This Employee Doesnt Exist")
         );
+
+        EmploymentBaseProj employmentBaseProj=employmentRepository.getEmployment(employeeEntity);
 
         BenefitRequestDTO request=new BenefitRequestDTO();
 
@@ -77,15 +91,28 @@ public class BenefitRequestService {
         benefitRequestEntity.setAmount(request.getAmount());
         benefitRequestEntity.setTransactionDate(LocalDate.parse(request.getTransactionDate()));
         benefitRequestEntity.setRemark(request.getRemark());
-        benefitRequestEntity.setStatus("PENDING");
+
         benefitRequestEntity.setRequestDateTime(LocalDateTime.now());
-        benefitRequestEntity.setRequestNo("BENEFIT/REQ"+existBenefitBalance.getPeriod()+"/"+ LocalDate.now()+"/"+existBenefitBalance.getBenefitBalanceId());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd/HH:mm:ss");
+
+        String formatDateTime = LocalDateTime.now().format(formatter);
+
+        benefitRequestEntity.setRequestNo("BENEFIT/REQ"+existBenefitBalance.getPeriod()+"/"+ formatDateTime+"/"+existBenefitBalance.getBenefitBalanceId());
         UploadFileResponse uploadFileResponse=uploadFileService.storeFile(file);
 
         benefitRequestEntity.setAttachment(uploadFileResponse.getAttachment());
         benefitRequestEntity.setFileName(uploadFileResponse.getFileName());
 
         benefitRequestRepository.save(benefitRequestEntity);
+
+        BenefitRequestStatus benefitRequestStatus=new BenefitRequestStatus();
+        benefitRequestStatus.setBenefitRequestEntity(benefitRequestEntity);
+        benefitRequestStatus.setStatus("PENDING");
+        benefitRequestStatus.setManagerId(managerRepository.findById(employmentBaseProj.getManagerId()).get());
+
+        benefitRequestStatusRepository.save(benefitRequestStatus);
+
 
         return new ResponseEntity<CustomMessageWithRequestNo>(new CustomMessageWithRequestNo("Submit Benefit Claim Successfully",false,benefitRequestEntity.getRequestNo()), HttpStatus.OK);
     }
@@ -100,18 +127,8 @@ public class BenefitRequestService {
                 ()->new CustomGenericException("This Employee Benefit Doesn't Exist")
         );
 
-        List<BenefitRequestResponse> allListBenefit=new ArrayList<>();
-        ModelMapper modelMapper=new ModelMapper();
-        benefitRequestRepository.findByBenefitBalanceIdOrderByRequestDateTimeDesc(existBenefitBalance).forEach(x->{
+        List<BenefitRequestResponse> allListBenefit=benefitRequestRepository.findByBenefitBalanceIdOrderByRequestDateTimeAsc(existBenefitBalance);
 
-
-            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("api/v1/downloadFile/")
-                    .path(x.getFileName())
-                    .toUriString();
-            x.setAttachment(fileDownloadUri);
-            allListBenefit.add(modelMapper.map(x,BenefitRequestResponse.class));
-        });
 
         return allListBenefit;
     }

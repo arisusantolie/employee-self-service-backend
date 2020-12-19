@@ -9,15 +9,15 @@ import java.util.Objects;
 public class AbsenceId implements Serializable {
 
     private Long employeeNo;
-    private LocalDateTime requestDateTime;
+    private String requestNo;
 
 
     public AbsenceId() {
     }
 
-    public AbsenceId(Long employeeNo, LocalDateTime requestDateTime) {
+    public AbsenceId(Long employeeNo, String requestNo) {
         this.employeeNo = employeeNo;
-        this.requestDateTime = requestDateTime;
+        this.requestNo = requestNo;
     }
 
     public Long getEmployeeNo() {
@@ -28,15 +28,13 @@ public class AbsenceId implements Serializable {
         this.employeeNo = employeeNo;
     }
 
-    public LocalDateTime getRequestDateTime() {
-        return requestDateTime;
+    public String getRequestNo() {
+        return requestNo;
     }
 
-    public void setRequestDateTime(LocalDateTime requestDateTime) {
-        this.requestDateTime = requestDateTime;
+    public void setRequestNo(String requestNo) {
+        this.requestNo = requestNo;
     }
-
-
 
     @Override
     public boolean equals(Object o) {
@@ -44,11 +42,11 @@ public class AbsenceId implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         AbsenceId absenceId = (AbsenceId) o;
         return Objects.equals(employeeNo, absenceId.employeeNo) &&
-                Objects.equals(requestDateTime, absenceId.requestDateTime);
+                Objects.equals(requestNo, absenceId.requestNo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(employeeNo, requestDateTime);
+        return Objects.hash(employeeNo, requestNo);
     }
 }

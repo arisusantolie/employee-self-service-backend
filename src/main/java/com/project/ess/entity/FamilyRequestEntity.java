@@ -15,7 +15,7 @@ public class FamilyRequestEntity {
     @JoinColumn(name = "family_id")
     private FamilyEntity familyId;
 
-    @Id
+
     private LocalDateTime requestDateTime;
 
     private String attachmentPath;
@@ -23,11 +23,10 @@ public class FamilyRequestEntity {
     @Lob
     @Column(length = 512)
     private String requestData;
-    private String status;
 
-    private Long approvedBy;
-    private LocalDateTime approvedDatetime;
     private String fileName;
+
+    @Id
     private String requestNo;
 
     public String getRequestNo() {
@@ -46,21 +45,7 @@ public class FamilyRequestEntity {
         this.fileName = fileName;
     }
 
-    public Long getApprovedBy() {
-        return approvedBy;
-    }
 
-    public void setApprovedBy(Long approvedBy) {
-        this.approvedBy = approvedBy;
-    }
-
-    public LocalDateTime getApprovedDatetime() {
-        return approvedDatetime;
-    }
-
-    public void setApprovedDatetime(LocalDateTime approvedDatetime) {
-        this.approvedDatetime = approvedDatetime;
-    }
 
     public FamilyRequestEntity() {
     }
@@ -97,11 +82,5 @@ public class FamilyRequestEntity {
         this.requestData = requestData;
     }
 
-    public String getStatus() {
-        return status;
-    }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
 }

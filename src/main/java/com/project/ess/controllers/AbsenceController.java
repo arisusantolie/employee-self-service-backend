@@ -37,7 +37,7 @@ public class AbsenceController {
         return absenceService.getListNeedApprove(authentication.getName());
     }
 
-    @GetMapping("/request/history")
+    @GetMapping("/request/approved/history")
     public List<AbsenceNeedApproveResponse> getListHistoryAbsenceReq(Authentication authentication){
 
         return absenceService.getListHistoryAbsence(authentication.getName());

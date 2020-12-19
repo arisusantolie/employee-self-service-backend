@@ -6,6 +6,7 @@ import com.project.ess.dto.AddressRequestDTO;
 import com.project.ess.entity.AddressEntity;
 import com.project.ess.entity.AddressRequestEntity;
 import com.project.ess.entity.EmployeeEntity;
+import com.project.ess.entity.approval.AddressRequestStatus;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.execptions.ErrorMessage;
@@ -13,9 +14,7 @@ import com.project.ess.model.AddressNeedApproveResponse;
 import com.project.ess.model.AddressResponse;
 import com.project.ess.model.UploadFileResponse;
 import com.project.ess.model.jsondata.AddressRequestJsonData;
-import com.project.ess.repository.AddressRepository;
-import com.project.ess.repository.AddressRequestRepository;
-import com.project.ess.repository.EmployeeRepository;
+import com.project.ess.repository.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +26,7 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -46,6 +46,11 @@ public class AddressService {
     @Autowired
     UploadFileService uploadFileService;
 
+    @Autowired
+    AddressRequestStatusRepository addressRequestStatusRepository;
+
+    @Autowired
+    HRAdminRepository hrAdminRepository;
 
 
     @Transactional
@@ -98,7 +103,7 @@ public class AddressService {
         AddressRequestEntity addressRequestEntity=new AddressRequestEntity();
 
         addressRequestEntity.setAddressId(addressEntity);
-        addressRequestEntity.setStatus("PENDING");
+
         addressRequestEntity.setRequestDateTime(LocalDateTime.now());
         addressRequestEntity.setRequestData(addressRequestJsonData.toString());
 
@@ -106,12 +111,23 @@ public class AddressService {
 
         addressRequestEntity.setAttachmentPath(uploadFileResponse.getAttachment());
         addressRequestEntity.setFileName(uploadFileResponse.getFileName());
-        addressRequestEntity.setRequestNo("ADDRESS/REQ/"+ LocalDate.now() +"/"+addressEntity.getAddressId());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd/HH:mm:ss");
+
+        String formatDateTime = LocalDateTime.now().format(formatter);
+
+        addressRequestEntity.setRequestNo("ADDRESS/REQ/"+ formatDateTime +"/"+addressEntity.getAddressId());
         addressRequestRepository.save(addressRequestEntity);
+
+        AddressRequestStatus addressRequestStatus=new AddressRequestStatus();
+        addressRequestStatus.setAddressRequestEntity(addressRequestEntity);
+        addressRequestStatus.setStatus("PENDING");
+        addressRequestStatusRepository.save(addressRequestStatus);
+
 
         AddressResponse returnValue=new AddressResponse();
         BeanUtils.copyProperties(addressEntity,returnValue);
-        returnValue.setStatus(addressRequestEntity.getStatus());
+        returnValue.setStatus(addressRequestStatus.getStatus());
 
         return returnValue;
     }
@@ -151,17 +167,25 @@ public class AddressService {
 
 
         addressRequestEntity.setAddressId(addressEntity);
-        addressRequestEntity.setStatus("PENDING");
+
         addressRequestEntity.setRequestDateTime(LocalDateTime.now());
         addressRequestEntity.setRequestData(addressRequestJsonData.toString());
         UploadFileResponse uploadFileResponse=uploadFileService.storeFile(file);
 
         addressRequestEntity.setAttachmentPath(uploadFileResponse.getAttachment());
         addressRequestEntity.setFileName(uploadFileResponse.getFileName());
-        addressRequestEntity.setRequestNo("ADDRESS/REQ/"+ LocalDate.now() +"/"+addressEntity.getAddressId());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd/HH:mm:ss");
+
+        String formatDateTime = LocalDateTime.now().format(formatter);
+        addressRequestEntity.setRequestNo("ADDRESS/REQ/"+ formatDateTime +"/"+addressEntity.getAddressId());
 //        System.out.println(addressRequestJsonData.toString());
 
         addressRequestRepository.save(addressRequestEntity);
+        AddressRequestStatus addressRequestStatus=new AddressRequestStatus();
+        addressRequestStatus.setAddressRequestEntity(addressRequestEntity);
+        addressRequestStatus.setStatus("PENDING");
+
+        addressRequestStatusRepository.save(addressRequestStatus);
 
         BeanUtils.copyProperties(request,addressEntity);
 //        System.out.println(addressEntity);

@@ -11,7 +11,7 @@ public class RoleEntity implements Serializable {
 
     private static final long serialVersionUID = -7630541240164240251L;
 
-    @javax.persistence.Id
+    @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long Id;
 

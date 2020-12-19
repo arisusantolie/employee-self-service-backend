@@ -14,6 +14,15 @@ public class AbsenceNeedApproveResponse {
     Long employeeNo;
     String employeeName;
     String requestNo;
+    String status;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public String getRequestNo() {
         return requestNo;
@@ -23,7 +32,7 @@ public class AbsenceNeedApproveResponse {
         this.requestNo = requestNo;
     }
 
-    public AbsenceNeedApproveResponse(AbsenceEntity absenceEntity, Long employeeNo, String employeeName, String requestNo) {
+    public AbsenceNeedApproveResponse(AbsenceEntity absenceEntity, Long employeeNo, String employeeName, String requestNo,String status) {
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("api/v1/downloadFile/")
                 .path(absenceEntity.getFileName())
@@ -34,7 +43,9 @@ public class AbsenceNeedApproveResponse {
         this.employeeNo = employeeNo;
         this.employeeName = employeeName;
         this.requestNo = requestNo;
+        this.status=status;
     }
+
 
     public AbsenceEntity getAbsenceEntity() {
         return absenceEntity;

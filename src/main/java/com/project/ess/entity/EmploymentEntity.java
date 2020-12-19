@@ -16,10 +16,8 @@ public class EmploymentEntity {
     private EmployeeEntity employee;
 
     @ManyToOne
-    @JoinColumn(name = "employeeDirectToId")
-    private EmployeeEntity employeeDirectToId;
-
-    private String department;
+    @JoinColumn(name = "divisi_id")
+    private DivisiEntity divisiEntity;
 
     private String position;
 
@@ -44,20 +42,13 @@ public class EmploymentEntity {
         this.employee = employee;
     }
 
-    public EmployeeEntity getEmployeeDirectToId() {
-        return employeeDirectToId;
+
+    public DivisiEntity getDivisiEntity() {
+        return divisiEntity;
     }
 
-    public void setEmployeeDirectToId(EmployeeEntity employeeDirectToId) {
-        this.employeeDirectToId = employeeDirectToId;
-    }
-
-    public String getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(String department) {
-        this.department = department;
+    public void setDivisiEntity(DivisiEntity divisiEntity) {
+        this.divisiEntity = divisiEntity;
     }
 
     public String getPosition() {

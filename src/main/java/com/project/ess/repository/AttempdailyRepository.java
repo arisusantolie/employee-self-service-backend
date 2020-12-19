@@ -18,15 +18,17 @@ public interface AttempdailyRepository extends JpaRepository<AttempdailyEntity,L
     public Optional<AttempdailyEntity> findByEmployeeNoAndActualTimeAndType(@Param("employeeNo") Long employeeNo,@Param("type") String type,@Param("date") LocalDate date);
 
     public List<AttempdailyEntity> findByEmployeeNoOrderByActualTime(EmployeeEntity employeeEntity);
-
-    @Query(value = "select * from attempdaily where month(actual_time)=:month and year(actual_time)=:year",nativeQuery = true)
-    public List<AttempdailyEntity> getTimeSheet(@Param("month") int month, @Param("year") int year);
-
-    @Query("select new com.project.ess.model.AttempdailyNeedResponse(ae,emp.employee.employeeNo,concat(emp.employee.firstName,' ',emp.employee.lastName),ae.requestNo ) from AttempdailyEntity ae,EmploymentEntity emp where " +
-            "ae.employeeNo=emp.employee and ae.status='PENDING'  and current_date>=emp.startDate and current_date<=emp.endDate and emp.employeeDirectToId=:employee order by ae.actualTime asc")
+//
+//    @Query(value = "select * from attempdaily where month(actual_time)=:month and year(actual_time)=:year",nativeQuery = true)
+//    public List<AttempdailyEntity> getTimeSheet(@Param("month") int month, @Param("year") int year);
+//
+    @Query("select new com.project.ess.model.AttempdailyNeedResponse(ae,emp.employeeNo,concat(emp.firstName,' ',emp.lastName),ae.requestNo,ats.status,ats.remark ) " +
+            "from AttempdailyEntity ae,AttempdailyStatus ats ,EmployeeEntity emp where ae.employeeNo=emp and ae=ats.attempdailyEntity and " +
+            "ats.status='PENDING' and ats.managerId.employeeEntity=:employee order by ae.actualTime asc")
     public List<AttempdailyNeedResponse> getListCheckInCheckOutNeedApprove(@Param("employee") EmployeeEntity employeeEntity);
 
-    @Query("select new com.project.ess.model.AttempdailyNeedResponse(ae,emp.employee.employeeNo,concat(emp.employee.firstName,' ',emp.employee.lastName),ae.requestNo ) from AttempdailyEntity ae,EmploymentEntity emp where " +
-            "ae.employeeNo=emp.employee and ae.status!='PENDING'  and current_date>=emp.startDate and current_date<=emp.endDate and emp.employeeDirectToId=:employee order by ae.actualTime asc")
+    @Query("select new com.project.ess.model.AttempdailyNeedResponse(ae,emp.employeeNo,concat(emp.firstName,' ',emp.lastName),ae.requestNo,ats.status,ats.remark ) " +
+            "from AttempdailyEntity ae,AttempdailyStatus ats ,EmployeeEntity emp where ae.employeeNo=emp and ae=ats.attempdailyEntity and " +
+            "ats.status!='PENDING' and ats.managerId.employeeEntity=:employee order by ae.actualTime asc")
     public List<AttempdailyNeedResponse> getListCheckInCheckOutHistory(@Param("employee") EmployeeEntity employeeEntity);
 }

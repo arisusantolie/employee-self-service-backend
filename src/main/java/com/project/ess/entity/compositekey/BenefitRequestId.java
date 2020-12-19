@@ -6,23 +6,22 @@ import java.util.Objects;
 
 public class BenefitRequestId implements Serializable {
     private Long benefitBalanceId;
-    private LocalDateTime requestDateTime;
+    private String requestNo;
 
     public BenefitRequestId() {
     }
 
-
-    public LocalDateTime getRequestDateTime() {
-        return requestDateTime;
-    }
-
-    public void setRequestDateTime(LocalDateTime requestDateTime) {
-        this.requestDateTime = requestDateTime;
-    }
-
-    public BenefitRequestId(Long benefitBalanceId, LocalDateTime requestDateTime) {
+    public BenefitRequestId(Long benefitBalanceId, String requestNo) {
         this.benefitBalanceId = benefitBalanceId;
-        this.requestDateTime = requestDateTime;
+        this.requestNo = requestNo;
+    }
+
+    public String getRequestNo() {
+        return requestNo;
+    }
+
+    public void setRequestNo(String requestNo) {
+        this.requestNo = requestNo;
     }
 
     public Long getBenefitBalanceId() {
@@ -39,11 +38,11 @@ public class BenefitRequestId implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         BenefitRequestId that = (BenefitRequestId) o;
         return Objects.equals(benefitBalanceId, that.benefitBalanceId) &&
-                Objects.equals(requestDateTime, that.requestDateTime);
+                Objects.equals(requestNo, that.requestNo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(benefitBalanceId, requestDateTime);
+        return Objects.hash(benefitBalanceId, requestNo);
     }
 }

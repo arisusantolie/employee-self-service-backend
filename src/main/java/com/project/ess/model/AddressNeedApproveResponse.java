@@ -1,5 +1,6 @@
 package com.project.ess.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ess.entity.AddressRequestEntity;
@@ -13,16 +14,18 @@ public class AddressNeedApproveResponse {
     String attachmentPath;
     String requestData;
     String status;
-    Long approvedBy;
+    Long hraId;
     LocalDateTime approvedDatetime;
     String fileName;
     AddressRequestJsonData addressRequestData;
     Long employeeNo;
     String employeeName;
     String requestNo;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     LocalDateTime requestDateTime;
 
-    public AddressNeedApproveResponse(Long addressId, String attachmentPath, String requestData, String status, Long approvedBy, LocalDateTime approvedDatetime, String fileName, Long employeeNo, String employeeName, String requestNo, LocalDateTime requestDateTime) throws JsonProcessingException {
+    public AddressNeedApproveResponse(Long addressId, String attachmentPath, String requestData, String status, Long hraId, LocalDateTime approvedDatetime, String fileName, Long employeeNo, String employeeName, String requestNo, LocalDateTime requestDateTime) throws JsonProcessingException {
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("api/v1/downloadFile/")
                 .path(fileName)
@@ -33,7 +36,7 @@ public class AddressNeedApproveResponse {
         this.attachmentPath = fileDownloadUri;
         this.requestData = requestData;
         this.status = status;
-        this.approvedBy = approvedBy;
+        this.hraId = hraId;
         this.approvedDatetime = approvedDatetime;
         this.fileName = fileName;
         this.employeeNo = employeeNo;
@@ -75,12 +78,13 @@ public class AddressNeedApproveResponse {
         this.status = status;
     }
 
-    public Long getApprovedBy() {
-        return approvedBy;
+
+    public Long getHraId() {
+        return hraId;
     }
 
-    public void setApprovedBy(Long approvedBy) {
-        this.approvedBy = approvedBy;
+    public void setHraId(Long hraId) {
+        this.hraId = hraId;
     }
 
     public LocalDateTime getApprovedDatetime() {

@@ -6,6 +6,7 @@ import com.project.ess.dto.FamilyDTO;
 import com.project.ess.entity.EmployeeEntity;
 import com.project.ess.entity.FamilyEntity;
 import com.project.ess.entity.FamilyRequestEntity;
+import com.project.ess.entity.approval.FamilyRequestStatus;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.model.FamilyNeedApproveResponse;
@@ -15,6 +16,7 @@ import com.project.ess.model.jsondata.FamilyRequestJsonData;
 import com.project.ess.repository.EmployeeRepository;
 import com.project.ess.repository.FamilyRepository;
 import com.project.ess.repository.FamilyRequestRepository;
+import com.project.ess.repository.FamilyRequestStatusRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,7 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +48,9 @@ public class FamilyService {
 
     @Autowired
     UploadFileService uploadFileService;
+
+    @Autowired
+    FamilyRequestStatusRepository familyRequestStatusRepository;
 
     @Transactional
     public ResponseEntity<CustomMessageWithId> addOrUpdateFamily(String family, MultipartFile file,String email){
@@ -111,16 +117,26 @@ public class FamilyService {
 
         FamilyRequestEntity familyRequestEntity=new FamilyRequestEntity();
         familyRequestEntity.setFamilyId(familyEntity);
-        familyRequestEntity.setStatus("PENDING");
+//        familyRequestEntity.setStatus("PENDING");
         familyRequestEntity.setRequestDateTime(LocalDateTime.now());
         familyRequestEntity.setRequestData(familyRequestJsonData.toString());
         UploadFileResponse uploadFileResponse=uploadFileService.storeFile(file);
 
         familyRequestEntity.setAttachmentPath(uploadFileResponse.getAttachment());
         familyRequestEntity.setFileName(uploadFileResponse.getFileName());
-        familyRequestEntity.setRequestNo("FAMILY/REQ/"+LocalDate.now()+"/"+familyEntity.getFamilyId());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd/HH:mm:ss");
+
+        String formatDateTime = LocalDateTime.now().format(formatter);
+        familyRequestEntity.setRequestNo("FAMILY/REQ/"+formatDateTime+"/"+familyEntity.getFamilyId());
 
         familyRequestRepository.save(familyRequestEntity);
+
+        FamilyRequestStatus familyRequestStatus=new FamilyRequestStatus();
+        familyRequestStatus.setFamilyRequestEntity(familyRequestEntity);
+        familyRequestStatus.setStatus("PENDING");
+        familyRequestStatusRepository.save(familyRequestStatus);
+
 
         return new ResponseEntity<CustomMessageWithId>(new CustomMessageWithId(message,false,familyEntity.getFamilyId()), HttpStatus.OK);
     }
@@ -134,6 +150,7 @@ public class FamilyService {
 
         List<FamilyResponse> listFamily=new ArrayList<>();
 
+        System.out.println(employeeEntity.getEmployeeNo());
         familyRepository.getFamilyListByEmployeeNo(employeeEntity.getEmployeeNo()).forEach(x->{
             FamilyResponse familyResponse=new FamilyResponse();
 

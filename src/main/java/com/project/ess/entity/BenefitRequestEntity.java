@@ -19,17 +19,15 @@ public class BenefitRequestEntity {
     @JsonBackReference
     private BenefitBalanceEntity benefitBalanceId;
 
-    @Id
+
     private LocalDateTime requestDateTime;
 
+    @Id
     private String requestNo;
     private String benefitReason;
     private BigDecimal amount;
     private LocalDate transactionDate;
     private String remark;
-    private String status;
-    private Long approvedBy;
-    private LocalDateTime approvedDatetime;
     private String attachment;
     private String fileName;
 
@@ -49,29 +47,6 @@ public class BenefitRequestEntity {
         this.attachment = attachment;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Long getApprovedBy() {
-        return approvedBy;
-    }
-
-    public void setApprovedBy(Long approvedBy) {
-        this.approvedBy = approvedBy;
-    }
-
-    public LocalDateTime getApprovedDatetime() {
-        return approvedDatetime;
-    }
-
-    public void setApprovedDatetime(LocalDateTime approvedDatetime) {
-        this.approvedDatetime = approvedDatetime;
-    }
 
     public BenefitBalanceEntity getBenefitBalanceId() {
         return benefitBalanceId;

@@ -7,12 +7,7 @@ import java.util.Objects;
 public class FamilyRequestId implements Serializable {
 
     private Long familyId;
-    private LocalDateTime requestDateTime;
-
-    public FamilyRequestId(Long familyId, LocalDateTime requestDateTime) {
-        this.familyId = familyId;
-        this.requestDateTime = requestDateTime;
-    }
+    private String requestNo;
 
     public FamilyRequestId() {
     }
@@ -25,12 +20,17 @@ public class FamilyRequestId implements Serializable {
         this.familyId = familyId;
     }
 
-    public LocalDateTime getRequestDateTime() {
-        return requestDateTime;
+    public FamilyRequestId(Long familyId, String requestNo) {
+        this.familyId = familyId;
+        this.requestNo = requestNo;
     }
 
-    public void setRequestDateTime(LocalDateTime requestDateTime) {
-        this.requestDateTime = requestDateTime;
+    public String getRequestNo() {
+        return requestNo;
+    }
+
+    public void setRequestNo(String requestNo) {
+        this.requestNo = requestNo;
     }
 
     @Override
@@ -39,11 +39,11 @@ public class FamilyRequestId implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         FamilyRequestId that = (FamilyRequestId) o;
         return Objects.equals(familyId, that.familyId) &&
-                Objects.equals(requestDateTime, that.requestDateTime);
+                Objects.equals(requestNo, that.requestNo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(familyId, requestDateTime);
+        return Objects.hash(familyId, requestNo);
     }
 }

@@ -1,11 +1,13 @@
 package com.project.ess.services;
 
 import com.project.ess.dto.EmploymentDTO;
+import com.project.ess.entity.DivisiEntity;
 import com.project.ess.entity.EmployeeEntity;
 import com.project.ess.entity.EmploymentEntity;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.projection.EmploymentBaseProj;
+import com.project.ess.repository.DivisiRepository;
 import com.project.ess.repository.EmployeeRepository;
 import com.project.ess.repository.EmploymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ public class EmploymentService {
     @Autowired
     EmployeeRepository employeeRepository;
 
+    @Autowired
+    DivisiRepository divisiRepository;
+
     public ResponseEntity<CustomMessageWithId> addManagerForEmployee(EmploymentDTO request){
 
         EmploymentEntity employmentEntity=new EmploymentEntity();
@@ -30,14 +35,15 @@ public class EmploymentService {
                 ()-> new CustomGenericException("This employee Doesn't exist")
         );
 
-        EmployeeEntity employeeManager=employeeRepository.findById(request.getEmployeeDirectToId()).orElseThrow(
-                ()-> new CustomGenericException("This employee Manager Doesn't exist")
+        DivisiEntity divisiEntity=divisiRepository.findById(request.getDivisiId()).orElseThrow(
+                ()-> new CustomGenericException("This Division Doesn't exist")
         );
 
         employmentEntity.setEmployee(employee);
-        employmentEntity.setEmployeeDirectToId(employeeManager);
+        employmentEntity.setDivisiEntity(divisiEntity);
+//        employmentEntity.setEmployeeDirectToId(employeeManager);
         employmentEntity.setEmployeeStatus(request.getEmployeeStatus());
-        employmentEntity.setDepartment(request.getDepartment());
+//        employmentEntity.setDepartment(request.getDepartment());
         employmentEntity.setPosition(request.getPosition());
         employmentEntity.setStartDate(request.getStartDate());
         employmentEntity.setEndDate(request.getEndDate());

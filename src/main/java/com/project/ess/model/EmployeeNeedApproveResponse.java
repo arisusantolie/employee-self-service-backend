@@ -13,7 +13,6 @@ public class EmployeeNeedApproveResponse {
     private Long employeeNo;
     private String requestData;
     private String status;
-    private Long approvedBy;
     private LocalDateTime approvedDatetime;
     private String fileName;
     private String requestNo;
@@ -21,7 +20,7 @@ public class EmployeeNeedApproveResponse {
     private LocalDateTime requestDateTime;
     private String employeeName;
 
-    public EmployeeNeedApproveResponse(Long employeeNo, String requestData, String status, Long approvedBy, LocalDateTime approvedDatetime, String fileName, String requestNo, String attachment, LocalDateTime requestDateTime, String employeeName) throws JsonProcessingException {
+    public EmployeeNeedApproveResponse(Long employeeNo, String requestData, String status, LocalDateTime approvedDatetime, String fileName, String requestNo, String attachment, LocalDateTime requestDateTime, String employeeName) throws JsonProcessingException {
         ObjectMapper objectMapper=new ObjectMapper();
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("api/v1/downloadFile/")
@@ -32,7 +31,6 @@ public class EmployeeNeedApproveResponse {
         this.employeeNo = employeeNo;
         this.requestData = requestData;
         this.status = status;
-        this.approvedBy = approvedBy;
         this.approvedDatetime = approvedDatetime;
         this.fileName = fileName;
         this.requestNo = requestNo;
@@ -73,13 +71,6 @@ public class EmployeeNeedApproveResponse {
         this.status = status;
     }
 
-    public Long getApprovedBy() {
-        return approvedBy;
-    }
-
-    public void setApprovedBy(Long approvedBy) {
-        this.approvedBy = approvedBy;
-    }
 
     public LocalDateTime getApprovedDatetime() {
         return approvedDatetime;

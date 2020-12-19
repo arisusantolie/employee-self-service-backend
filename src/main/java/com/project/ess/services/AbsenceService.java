@@ -1,21 +1,24 @@
 package com.project.ess.services;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ess.dto.AbsenceDTO;
 import com.project.ess.entity.AbsenceEntity;
 import com.project.ess.entity.EmployeeEntity;
+import com.project.ess.entity.approval.AbsenceStatus;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithRequestNo;
 import com.project.ess.model.AbsenceNeedApproveResponse;
 import com.project.ess.model.AbsenceResponse;
 import com.project.ess.model.AddressResponse;
 import com.project.ess.model.UploadFileResponse;
-import com.project.ess.repository.AbsenceRepository;
-import com.project.ess.repository.EmployeeRepository;
+import com.project.ess.projection.EmploymentBaseProj;
+import com.project.ess.repository.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,10 +27,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import javax.transaction.Transactional;
 
 @Service
 public class AbsenceService {
@@ -41,11 +48,26 @@ public class AbsenceService {
     @Autowired
     UploadFileService uploadFileService;
 
+    @Autowired
+    AbsenceStatusRepository absenceStatusRepository;
+
+    @Autowired
+    EmploymentRepository employmentRepository;
+
+    @Autowired
+    ManagerRepository managerRepository;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    LocalDateTime timenow=LocalDateTime.now();
+
+    @Transactional
     public ResponseEntity<CustomMessageWithRequestNo> addAbsence(String absence, MultipartFile file,String email){
+
+
         EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
                 ()->  new CustomGenericException("This Employee Doesnt Exist")
         );
-
+        EmploymentBaseProj employmentBaseProj=employmentRepository.getEmployment(employeeEntity);
         AbsenceDTO absenceDTO=new AbsenceDTO();
 
         try{
@@ -64,12 +86,24 @@ public class AbsenceService {
         absenceEntity.setEndDate(LocalDate.parse(absenceDTO.getEndDate()));
         absenceEntity.setEmployeeNo(employeeEntity);
         absenceEntity.setRequestDateTime(LocalDateTime.now());
-        absenceEntity.setStatus("PENDING");
+
         absenceEntity.setAttachment(uploadFileResponse.getAttachment());
         absenceEntity.setFileName(uploadFileResponse.getFileName());
-        absenceEntity.setRequestNo("ABSENCE/"+absenceDTO.getType().replace(" ","-").toUpperCase()+"/"+ LocalDate.now()+"/"+employeeEntity.getEmployeeNo());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd/HH:mm:ss");
+
+        String formatDateTime = LocalDateTime.now().format(formatter);
+        absenceEntity.setRequestNo("ABSENCE/"+absenceDTO.getType().replace(" ","-").toUpperCase()+"/"+formatDateTime+"/"+employeeEntity.getEmployeeNo());
 
         absenceRepository.save(absenceEntity);
+        AbsenceStatus absenceStatus=new AbsenceStatus();
+
+
+        absenceStatus.setAbsenceEntity(absenceEntity);
+        absenceStatus.setStatus("PENDING");
+        absenceStatus.setManagerId(managerRepository.findById(employmentBaseProj.getManagerId()).get());
+
+        absenceStatusRepository.save(absenceStatus);
 
         return new ResponseEntity<CustomMessageWithRequestNo>(new CustomMessageWithRequestNo("Submit Absence Succesfully",false,absenceEntity.getRequestNo()), HttpStatus.OK);
     }
@@ -84,14 +118,17 @@ public class AbsenceService {
         ModelMapper modelMapper=new ModelMapper();
 
         absenceEntityList.forEach(x->{
-
+            AbsenceStatus absenceStatus=absenceStatusRepository.findByAbsenceEntity(x);
             String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("api/v1/downloadFile/")
                     .path(x.getFileName())
                     .toUriString();
             x.setAttachment(fileDownloadUri);
 
-            allList.add(modelMapper.map(x, AbsenceResponse.class));
+            AbsenceResponse absenceResponse=modelMapper.map(x, AbsenceResponse.class);
+            BeanUtils.copyProperties(absenceStatus,absenceResponse);
+
+            allList.add(absenceResponse);
         });
 
 
