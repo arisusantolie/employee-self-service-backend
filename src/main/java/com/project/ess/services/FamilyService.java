@@ -182,6 +182,15 @@ public class FamilyService {
 
     }
 
+    public List<FamilyNeedApproveResponse> getListFamilyRequest(String email){
+
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+        return familyRequestRepository.getListFamilyNeedApprove(employeeEntity);
+    }
+
     public List<FamilyNeedApproveResponse> getListFamNeedApprove(String email){
 
         EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(

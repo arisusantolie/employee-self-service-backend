@@ -60,6 +60,9 @@ public class AbsenceService {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     LocalDateTime timenow=LocalDateTime.now();
 
+    @Autowired
+    AbsenceTypeRepository absenceTypeRepository;
+
     @Transactional
     public ResponseEntity<CustomMessageWithRequestNo> addAbsence(String absence, MultipartFile file,String email){
 
@@ -95,6 +98,8 @@ public class AbsenceService {
         String formatDateTime = LocalDateTime.now().format(formatter);
         absenceEntity.setRequestNo("ABSENCE/"+absenceDTO.getType().replace(" ","-").toUpperCase()+"/"+formatDateTime+"/"+employeeEntity.getEmployeeNo());
 
+
+        absenceEntity.setAbsenceTypeEntity(absenceTypeRepository.findById(absenceDTO.getAbsenceTypeId()).get());
         absenceRepository.save(absenceEntity);
         AbsenceStatus absenceStatus=new AbsenceStatus();
 

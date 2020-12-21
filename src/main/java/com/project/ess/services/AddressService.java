@@ -224,6 +224,14 @@ public class AddressService {
         return allList;
     }
 
+    public List<AddressNeedApproveResponse> getListAddreesRequest(String email){
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+        return addressRequestRepository.getListAddressRequestEmp(employeeEntity);
+    }
+
     public List<AddressNeedApproveResponse> getListAddreesNeedApprove(String email){
         EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
                 ()->  new CustomGenericException("This Employee Doesnt Exist")

@@ -2,6 +2,7 @@ package com.project.ess.entity.security;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.List;
 
 @Entity(name = "authorities")
 public class AuthorityEntity {
@@ -16,7 +17,15 @@ public class AuthorityEntity {
     private String name;
 
     @ManyToMany(mappedBy = "authorities",cascade = CascadeType.PERSIST)
-    private Collection<RoleEntity> roles;
+    private List<RoleEntity> roles;
+
+    public AuthorityEntity(String name) {
+        this.name=name;
+    }
+
+    public AuthorityEntity() {
+
+    }
 
     public Long getId() {
         return id;
@@ -34,11 +43,11 @@ public class AuthorityEntity {
         this.name = name;
     }
 
-    public Collection<RoleEntity> getRoles() {
+    public List<RoleEntity> getRoles() {
         return roles;
     }
 
-    public void setRoles(Collection<RoleEntity> roles) {
+    public void setRoles(List<RoleEntity> roles) {
         this.roles = roles;
     }
 }

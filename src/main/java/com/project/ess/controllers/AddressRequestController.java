@@ -25,10 +25,14 @@ public class AddressRequestController {
 
         return addressService.createRequest(address,file);
     }
+    @GetMapping()
+    public List<AddressNeedApproveResponse> getListAddressRequest(Authentication authentication){
+        return addressService.getListAddreesRequest(authentication.getName());
+    }
 
-
-    @GetMapping("/needapprove")
+    @GetMapping("needapprove")
     public List<AddressNeedApproveResponse> getListAddressNeedApproveByManager(Authentication authentication){
+        System.out.println("masuk");
         return addressService.getListAddreesNeedApprove(authentication.getName());
     }
 

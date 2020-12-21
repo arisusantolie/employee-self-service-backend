@@ -42,4 +42,13 @@ public class AbsenceController {
 
         return absenceService.getListHistoryAbsence(authentication.getName());
     }
+
+    @PostMapping("/request/approve")
+    public ResponseEntity<CustomMessageWithRequestNo> approveRequestAbsence(Authentication authentication){
+
+
+        return null;
+    }
+
+
 }

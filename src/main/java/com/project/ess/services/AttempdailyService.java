@@ -8,6 +8,7 @@ import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.execptions.CustomMessageWithRequestNo;
 import com.project.ess.model.AttempdailyNeedResponse;
+import com.project.ess.model.TimesheetResponse;
 import com.project.ess.projection.EmploymentBaseProj;
 import com.project.ess.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -110,5 +112,24 @@ public class AttempdailyService {
         );
 
         return attempdailyRepository.getListCheckInCheckOutHistory(employeeEntity);
+    }
+
+    public List<TimesheetResponse> getListTimeSheet(String email,String month,String year){
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+        List<TimesheetResponse> timesheetResponseList=new ArrayList<>();
+
+        attempdailyRepository.getListTimeSheet(employeeEntity.getEmployeeNo(),month,year).forEach(x->{
+            TimesheetResponse  timesheetResponse=new TimesheetResponse();
+            timesheetResponse.setCheckInTime(x.get("checkinTime")==null?"-":x.get("checkinTime").toString());
+            timesheetResponse.setCheckOutTime(x.get("checkoutTime")==null?"-":x.get("checkoutTime").toString());
+            timesheetResponse.setDate(x.get("date").toString());
+
+            timesheetResponseList.add(timesheetResponse);
+        });
+
+        return timesheetResponseList;
     }
 }

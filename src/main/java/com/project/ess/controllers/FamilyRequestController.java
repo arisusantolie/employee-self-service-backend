@@ -23,6 +23,12 @@ public class FamilyRequestController {
         return familyService.addOrUpdateFamily(family,file,authentication.getName());
     }
 
+    @GetMapping()
+    public List<FamilyNeedApproveResponse> getListFamilyRequest(Authentication authentication){
+
+        return familyService.getListFamNeedApprove(authentication.getName());
+    }
+
     @GetMapping("/needapprove")
     public List<FamilyNeedApproveResponse> getListFamilyReqNeedApprove(Authentication authentication){
 

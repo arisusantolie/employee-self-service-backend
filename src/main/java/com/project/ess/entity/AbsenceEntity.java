@@ -37,7 +37,19 @@ public class AbsenceEntity implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
     private String remark;
-    private String type;
+
+    @ManyToOne
+    @JoinColumn(name = "absence_type_id")
+    private AbsenceTypeEntity absenceTypeEntity;
+
+
+    public AbsenceTypeEntity getAbsenceTypeEntity() {
+        return absenceTypeEntity;
+    }
+
+    public void setAbsenceTypeEntity(AbsenceTypeEntity absenceTypeEntity) {
+        this.absenceTypeEntity = absenceTypeEntity;
+    }
 
     private String attachment;
 
@@ -116,11 +128,5 @@ public class AbsenceEntity implements Serializable {
         this.remark = remark;
     }
 
-    public String getType() {
-        return type;
-    }
 
-    public void setType(String type) {
-        this.type = type;
-    }
 }

@@ -10,6 +10,7 @@ import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface AttempdailyRepository extends JpaRepository<AttempdailyEntity,Long> {
@@ -31,4 +32,12 @@ public interface AttempdailyRepository extends JpaRepository<AttempdailyEntity,L
             "from AttempdailyEntity ae,AttempdailyStatus ats ,EmployeeEntity emp where ae.employeeNo=emp and ae=ats.attempdailyEntity and " +
             "ats.status!='PENDING' and ats.managerId.employeeEntity=:employee order by ae.actualTime asc")
     public List<AttempdailyNeedResponse> getListCheckInCheckOutHistory(@Param("employee") EmployeeEntity employeeEntity);
+
+    @Query(value = "SELECT (SELECT DATE_FORMAT(atp.actual_time,\"%H:%i\") FROM attempdaily atp WHERE DATE(atp.actual_time)=DATE(attp.actual_time) AND atp.type=\"CHECKIN\" GROUP BY DATE(attp.`actual_time`)) AS checkinTime,\n" +
+            "(SELECT DATE_FORMAT(atp.actual_time,\"%H:%i\")  FROM attempdaily atp WHERE DATE(atp.actual_time)=DATE(attp.actual_time) AND atp.type=\"CHECKOUT\" GROUP BY DATE(attp.`actual_time`)) AS checkoutTime,\n" +
+            "DATE_FORMAT(attp.actual_time,\"%W, %d-%b-%Y\") AS DATE FROM attempdaily attp WHERE employee_no=:employeeno AND DATE_FORMAT(attp.`actual_time`,\"%c\")=:month \n" +
+            "AND DATE_FORMAT(attp.actual_time,\"%Y\")=:year GROUP BY DATE(attp.`actual_time`)",nativeQuery = true)
+    public List<Map<String,Object>> getListTimeSheet(@Param("employeeno") Long empNo,@Param("month") String month,@Param("year") String year);
+
+
 }

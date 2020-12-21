@@ -5,6 +5,7 @@ import com.project.ess.entity.security.RoleEntity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
 @Entity(name = "user")
 public class UserEntity implements Serializable {
@@ -25,7 +26,7 @@ public class UserEntity implements Serializable {
     @JoinTable(name="user_roles",
             joinColumns =@JoinColumn(name ="user_id" ,referencedColumnName ="id" ) ,
             inverseJoinColumns = @JoinColumn(name = "roles_id",referencedColumnName = "id"))
-    private Collection<RoleEntity> roles;
+    private List<RoleEntity> roles;
 
 
     private String profilePicture;
@@ -47,11 +48,11 @@ public class UserEntity implements Serializable {
         this.profilePicture = profilePicture;
     }
 
-    public Collection<RoleEntity> getRoles() {
+    public List<RoleEntity> getRoles() {
         return roles;
     }
 
-    public void setRoles(Collection<RoleEntity> roles) {
+    public void setRoles(List<RoleEntity> roles) {
         this.roles = roles;
     }
 

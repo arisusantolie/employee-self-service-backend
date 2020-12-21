@@ -9,6 +9,15 @@ public class AbsenceDTO {
     private String endDate;
     private String remark;
     private String type;
+    private Long absenceTypeId;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getAmount() {
         return amount;
@@ -42,11 +51,11 @@ public class AbsenceDTO {
         this.remark = remark;
     }
 
-    public String getType() {
-        return type;
+    public Long getAbsenceTypeId() {
+        return absenceTypeId;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setAbsenceTypeId(Long absenceTypeId) {
+        this.absenceTypeId = absenceTypeId;
     }
 }

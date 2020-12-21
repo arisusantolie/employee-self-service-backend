@@ -7,6 +7,7 @@ import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.execptions.CustomMessageWithRequestNo;
 import com.project.ess.model.AttempdailyNeedResponse;
+import com.project.ess.model.TimesheetResponse;
 import com.project.ess.repository.AttempdailyRepository;
 import com.project.ess.repository.EmployeeRepository;
 import com.project.ess.services.AttempdailyService;
@@ -41,13 +42,13 @@ public class AttempdailyController {
 
         return attempdailyService.getListByEmp(authentication.getName());
     }
-//
-//    @GetMapping("/request/timesheet")
-//    public List<AttempdailyEntity> getTimeshett(){
-//
-//        return attempdailyRepository.getTimeSheet(12,2020);
-//    }
-//
+
+    @GetMapping("timesheet")
+    public List<TimesheetResponse> getTimeshett(Authentication authentication,@RequestParam("month") String month, @RequestParam("year") String year){
+
+        return attempdailyService.getListTimeSheet(authentication.getName(),month,year);
+    }
+
     @GetMapping("/request/needapprove")
     public List<AttempdailyNeedResponse> getListCheckInCheckOutNeedApprove(Authentication authentication){
         return attempdailyService.getListCheckInCheckOutNeedApprove(authentication.getName());

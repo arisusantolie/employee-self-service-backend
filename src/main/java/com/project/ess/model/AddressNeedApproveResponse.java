@@ -14,7 +14,6 @@ public class AddressNeedApproveResponse {
     String attachmentPath;
     String requestData;
     String status;
-    Long hraId;
     LocalDateTime approvedDatetime;
     String fileName;
     AddressRequestJsonData addressRequestData;
@@ -25,7 +24,7 @@ public class AddressNeedApproveResponse {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     LocalDateTime requestDateTime;
 
-    public AddressNeedApproveResponse(Long addressId, String attachmentPath, String requestData, String status, Long hraId, LocalDateTime approvedDatetime, String fileName, Long employeeNo, String employeeName, String requestNo, LocalDateTime requestDateTime) throws JsonProcessingException {
+    public AddressNeedApproveResponse(Long addressId, String attachmentPath, String requestData, String status, LocalDateTime approvedDatetime, String fileName, Long employeeNo, String employeeName, String requestNo, LocalDateTime requestDateTime) throws JsonProcessingException {
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("api/v1/downloadFile/")
                 .path(fileName)
@@ -36,7 +35,6 @@ public class AddressNeedApproveResponse {
         this.attachmentPath = fileDownloadUri;
         this.requestData = requestData;
         this.status = status;
-        this.hraId = hraId;
         this.approvedDatetime = approvedDatetime;
         this.fileName = fileName;
         this.employeeNo = employeeNo;
@@ -44,6 +42,10 @@ public class AddressNeedApproveResponse {
         this.requestNo = requestNo;
         this.requestDateTime = requestDateTime;
 
+    }
+
+    public AddressNeedApproveResponse(String fileName) {
+        this.fileName = fileName;
     }
 
     public Long getAddressId() {
@@ -79,13 +81,6 @@ public class AddressNeedApproveResponse {
     }
 
 
-    public Long getHraId() {
-        return hraId;
-    }
-
-    public void setHraId(Long hraId) {
-        this.hraId = hraId;
-    }
 
     public LocalDateTime getApprovedDatetime() {
         return approvedDatetime;
