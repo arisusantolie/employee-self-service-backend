@@ -238,4 +238,34 @@ public class EmployeeService {
         return employeeRequestRepository.getListEmpHistory(employeeEntity);
     }
 
+    @Transactional
+    public ResponseEntity<CustomMessageWithId> cancelEmployeeRequest(String requestNo) throws JsonProcessingException {
+
+
+        EmployeeRequestEntity employeeRequestEntity=employeeRequestRepository.findByRequestNo(requestNo);
+        EmployeeEntity employeeEntity=employeeRepository.findById(employeeRequestEntity.getEmployeeNo().getEmployeeNo()).get();
+        EmployeeRequestStatus employeeRequestStatus=employeeRequestStatusRepository.findByEmployeeRequestEntity(employeeRequestEntity);
+
+        if(!employeeRequestStatus.getStatus().equalsIgnoreCase("PENDING")){
+            throw new CustomGenericException("This Request Cant Be cancel");
+        }
+
+        ObjectMapper objectMapper=new ObjectMapper();
+        EmployeeRequestJsonData employeeRequestJsonData=objectMapper.readValue(employeeRequestEntity.getRequestData(),EmployeeRequestJsonData.class);
+
+
+
+        BeanUtils.copyProperties(employeeRequestJsonData,employeeEntity);
+
+        employeeRequestStatus.setStatus("CANCEL");
+
+
+        employeeRequestStatusRepository.save(employeeRequestStatus);
+
+        employeeRepository.save(employeeEntity);
+
+
+        return new ResponseEntity<>(new CustomMessageWithId("Request Was Canceled",false,null),HttpStatus.OK);
+    }
+
 }

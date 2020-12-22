@@ -35,9 +35,11 @@ public interface AttempdailyRepository extends JpaRepository<AttempdailyEntity,L
 
     @Query(value = "SELECT (SELECT DATE_FORMAT(atp.actual_time,\"%H:%i\") FROM attempdaily atp WHERE DATE(atp.actual_time)=DATE(attp.actual_time) AND atp.type=\"CHECKIN\" GROUP BY DATE(attp.`actual_time`)) AS checkinTime,\n" +
             "(SELECT DATE_FORMAT(atp.actual_time,\"%H:%i\")  FROM attempdaily atp WHERE DATE(atp.actual_time)=DATE(attp.actual_time) AND atp.type=\"CHECKOUT\" GROUP BY DATE(attp.`actual_time`)) AS checkoutTime,\n" +
-            "DATE_FORMAT(attp.actual_time,\"%W, %d-%b-%Y\") AS DATE FROM attempdaily attp WHERE employee_no=:employeeno AND DATE_FORMAT(attp.`actual_time`,\"%c\")=:month \n" +
-            "AND DATE_FORMAT(attp.actual_time,\"%Y\")=:year GROUP BY DATE(attp.`actual_time`)",nativeQuery = true)
+            "ats.status,ats.remark,DATE_FORMAT(attp.actual_time,\"%W, %d-%b-%Y\") AS DATE FROM attempdaily attp,attempdaily_status ats WHERE attp.`request_no`=ats.request_no AND attp.employee_no=:employeeno AND DATE_FORMAT(attp.`actual_time`,\"%c\")=:month \n" +
+            "AND DATE_FORMAT(attp.actual_time,\"%Y\")=:year AND ats.status!='PENDING' GROUP BY DATE(attp.`actual_time`);",nativeQuery = true)
     public List<Map<String,Object>> getListTimeSheet(@Param("employeeno") Long empNo,@Param("month") String month,@Param("year") String year);
+
+    public Optional<AttempdailyEntity>  findByRequestNo(String requestNo);
 
 
 }

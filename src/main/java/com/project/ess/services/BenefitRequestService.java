@@ -8,6 +8,7 @@ import com.project.ess.entity.BenefitRequestEntity;
 import com.project.ess.entity.EmployeeEntity;
 import com.project.ess.entity.approval.BenefitRequestStatus;
 import com.project.ess.execptions.CustomGenericException;
+import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.execptions.CustomMessageWithRequestNo;
 import com.project.ess.model.BenefitBalanceResponse;
 import com.project.ess.model.BenefitNeedApproveResponse;
@@ -151,5 +152,23 @@ public class BenefitRequestService {
 
 
         return benefitRequestRepository.getListBenefitHistory(employeeEntity);
+    }
+
+    public ResponseEntity<CustomMessageWithId> cancelRequestBenefitClaim(String requestNo){
+        BenefitRequestEntity benefitRequestEntity=benefitRequestRepository.findByRequestNo(requestNo).orElseThrow(
+                ()->new CustomGenericException("Benefit request Doesnt exist")
+        );
+        BenefitRequestStatus benefitRequestStatus=benefitRequestStatusRepository.findByBenefitRequestEntity(benefitRequestEntity);
+
+        System.out.println(benefitRequestStatus.getStatus());
+
+        if(!benefitRequestStatus.getStatus().equalsIgnoreCase("PENDING")){
+            throw new CustomGenericException("Claim Request Cant Be cancel");
+        }
+
+        benefitRequestStatus.setStatus("CANCEL");
+        benefitRequestStatusRepository.save(benefitRequestStatus);
+
+        return new ResponseEntity<>(new CustomMessageWithId("Claim Was Canceled",false,null),HttpStatus.OK);
     }
 }

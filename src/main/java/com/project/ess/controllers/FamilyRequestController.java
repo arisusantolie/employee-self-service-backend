@@ -1,5 +1,6 @@
 package com.project.ess.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.model.FamilyNeedApproveResponse;
 import com.project.ess.services.FamilyService;
@@ -39,5 +40,11 @@ public class FamilyRequestController {
     public List<FamilyNeedApproveResponse> getListHistoryFamilyReq(Authentication authentication){
 
         return familyService.getHistoryFamRequest(authentication.getName());
+    }
+
+    @GetMapping("cancel")
+    public ResponseEntity<CustomMessageWithId> cancelRequestFamily(@RequestParam("requestNo") String requestNo) throws JsonProcessingException {
+
+        return familyService.cancelFamilyRequest(requestNo);
     }
 }

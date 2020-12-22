@@ -1,5 +1,6 @@
 package com.project.ess.controllers;
 
+import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.execptions.CustomMessageWithRequestNo;
 import com.project.ess.model.AbsenceNeedApproveResponse;
 import com.project.ess.model.AbsenceResponse;
@@ -48,6 +49,12 @@ public class AbsenceController {
 
 
         return null;
+    }
+
+    @GetMapping("request/cancel")
+    public ResponseEntity<CustomMessageWithId> cancelRequestAbsence(@RequestParam("requestNo") String requestNo){
+
+        return absenceService.cancelRequestAbsence(requestNo);
     }
 
 

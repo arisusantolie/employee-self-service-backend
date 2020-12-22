@@ -1,5 +1,6 @@
 package com.project.ess.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ess.dto.AddressRequestDTO;
 import com.project.ess.dto.FamilyDTO;
@@ -207,5 +208,36 @@ public class FamilyService {
         );
 
         return familyRequestRepository.getListHistoryFamilyRequest(employeeEntity);
+    }
+
+    @Transactional
+    public ResponseEntity<CustomMessageWithId> cancelFamilyRequest(String requestNo) throws JsonProcessingException {
+        FamilyRequestEntity familyRequestEntity=familyRequestRepository.findByRequestNo(requestNo).orElseThrow(
+                ()-> new CustomGenericException("Family Request Doesnt Exist")
+        );
+        FamilyEntity familyEntity=familyRepository.findById(familyRequestEntity.getFamilyId().getFamilyId()).get();
+        FamilyRequestStatus familyRequestStatus=familyRequestStatusRepository.findByFamilyRequestEntity(familyRequestEntity);
+
+        if(!familyRequestStatus.getStatus().equalsIgnoreCase("PENDING")){
+            throw new CustomGenericException("Request Cant be Cancel");
+        }
+        ObjectMapper objectMapper=new ObjectMapper();
+
+        FamilyRequestJsonData familyRequestJsonData=objectMapper.readValue(familyRequestEntity.getRequestData(),FamilyRequestJsonData.class);
+        if(familyRequestJsonData.getFamilyId()==null){
+            familyRequestStatusRepository.deleteFamilyRequesStatusByFamilyReqEntity(familyRequestEntity);
+            familyRequestRepository.deleteFamilyRequestByRequestNo(requestNo);
+            familyRepository.deleteFamilyById(familyRequestEntity.getFamilyId().getFamilyId());
+        }else{
+            BeanUtils.copyProperties(familyRequestJsonData,familyEntity);
+            familyRequestStatus.setStatus("CANCEL");
+            familyRequestStatusRepository.save(familyRequestStatus);
+
+            familyRepository.save(familyEntity);
+        }
+
+        return new ResponseEntity<>(new CustomMessageWithId("Family Request Was Canceled",false,null),HttpStatus.OK);
+
+
     }
 }

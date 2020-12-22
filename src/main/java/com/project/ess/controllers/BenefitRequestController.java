@@ -1,5 +1,6 @@
 package com.project.ess.controllers;
 
+import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.execptions.CustomMessageWithRequestNo;
 import com.project.ess.model.BenefitNeedApproveResponse;
 import com.project.ess.model.BenefitRequestResponse;
@@ -41,5 +42,10 @@ public class BenefitRequestController {
     public List<BenefitNeedApproveResponse> getListHistoryBenefitRequest(Authentication authentication){
 
         return benefitRequestService.getListBenefitHistoryRequest(authentication.getName());
+    }
+
+    @GetMapping("cancel")
+    public ResponseEntity<CustomMessageWithId> cancelRequestBenefit(@RequestParam("requestNo") String requestNo){
+        return benefitRequestService.cancelRequestBenefitClaim(requestNo);
     }
 }

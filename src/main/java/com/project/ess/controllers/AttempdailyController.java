@@ -58,4 +58,10 @@ public class AttempdailyController {
     public List<AttempdailyNeedResponse> getListCheckInCheckOutHistory(Authentication authentication){
         return attempdailyService.getListCheckInCheckOutHistory(authentication.getName());
     }
+
+    @GetMapping("request/cancel")
+    public ResponseEntity<CustomMessageWithId> cancelRequestAttempdaily(@RequestParam("requestNo") String requestNo){
+
+        return attempdailyService.cancelRequestAttempdaily(requestNo);
+    }
 }

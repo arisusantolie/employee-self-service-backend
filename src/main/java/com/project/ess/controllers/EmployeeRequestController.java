@@ -1,5 +1,6 @@
 package com.project.ess.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.model.EmployeeNeedApproveResponse;
 import com.project.ess.model.EmployeeRequestResponse;
@@ -43,5 +44,12 @@ public class EmployeeRequestController {
 
 
         return employeeService.getAllEmpRequestHistory(authentication.getName());
+    }
+
+    @GetMapping("cancel")
+    public ResponseEntity<CustomMessageWithId> cancelRequestEmpBio(@RequestParam("requestNo") String requestNo) throws JsonProcessingException {
+
+
+        return employeeService.cancelEmployeeRequest(requestNo);
     }
 }

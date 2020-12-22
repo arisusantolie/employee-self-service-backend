@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -126,10 +127,32 @@ public class AttempdailyService {
             timesheetResponse.setCheckInTime(x.get("checkinTime")==null?"-":x.get("checkinTime").toString());
             timesheetResponse.setCheckOutTime(x.get("checkoutTime")==null?"-":x.get("checkoutTime").toString());
             timesheetResponse.setDate(x.get("date").toString());
+            timesheetResponse.setStatus(x.get("status").toString());
+            timesheetResponse.setRemark(x.get("remark")==null?"-":x.get("remark").toString());
 
             timesheetResponseList.add(timesheetResponse);
         });
 
         return timesheetResponseList;
+    }
+
+    @Transactional
+    public ResponseEntity<CustomMessageWithId> cancelRequestAttempdaily(String requestNo){
+        AttempdailyEntity attempdailyEntity=attempdailyRepository.findByRequestNo(requestNo).orElseThrow(
+                ()-> new CustomGenericException("Attempdaily Request Doesnt Exist")
+        );
+
+
+
+        AttempdailyStatus attempdailyStatus=attempdailyStatusRepository.findByAttempdailyEntity(attempdailyEntity);
+
+        if(!attempdailyStatus.getStatus().equals("PENDING")){
+            throw new CustomGenericException("Request Attempdaily cant be cancel");
+        }
+
+        attempdailyStatusRepository.delete(attempdailyStatus);
+        attempdailyRepository.delete(attempdailyEntity);
+
+        return new ResponseEntity<>(new CustomMessageWithId("Attempdaily was canceled",false,null),HttpStatus.OK);
     }
 }

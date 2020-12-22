@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AbsenceStatusRepository extends JpaRepository<AbsenceStatus,Long> {
 
     public AbsenceStatus findByAbsenceEntity(AbsenceEntity absenceEntity);
+
+
 }

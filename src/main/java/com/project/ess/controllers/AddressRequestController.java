@@ -1,5 +1,6 @@
 package com.project.ess.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.ess.dto.AddressRequestDTO;
 import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.model.AddressNeedApproveResponse;
@@ -39,5 +40,11 @@ public class AddressRequestController {
     @GetMapping("/history") //untuk history approval untuk admin, bukan employee biasa
     public List<AddressNeedApproveResponse> getListAddressHistory(Authentication authentication){
         return addressService.getListAddreesHistory(authentication.getName());
+    }
+
+    @GetMapping("cancel")
+    public ResponseEntity<CustomMessageWithId> cancelRequestAddress(@RequestParam("requestNo") String requestNo) throws JsonProcessingException {
+
+        return addressService.cancelRequestAddressEmployee(requestNo);
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -23,5 +24,9 @@ public interface AddressRepository extends JpaRepository<AddressEntity,Long> {
             "AND ad.`employee_no`=:employee AND adr.`address_id`=ars.address_id AND adr.`request_no`=ars.request_no  " +
             "AND (adr.address_id,adr.request_date_time) IN (SELECT address_id,MAX(request_date_time) FROM address_request) GROUP BY address_id",nativeQuery = true)
     public List<Map<String,Object>> getAllListAddress(@Param("employee") Long empNo);
+
+    @Modifying
+    @Query("delete from AddressEntity where addressId=:address")
+    public void deleteAddressEntity(@Param("address") Long addressId);
 }
 

@@ -33,4 +33,6 @@ public interface EmployeeRequestRepository extends JpaRepository<EmployeeRequest
     public List<EmployeeNeedApproveResponse> getListEmpHistory(@Param("employee") EmployeeEntity employee);
 
 
+
+    public EmployeeRequestEntity findByRequestNo(String requestNo);
 }

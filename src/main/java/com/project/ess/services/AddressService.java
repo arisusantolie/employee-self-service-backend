@@ -1,5 +1,6 @@
 package com.project.ess.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ess.dto.AddressDTO;
 import com.project.ess.dto.AddressRequestDTO;
@@ -7,6 +8,7 @@ import com.project.ess.entity.AddressEntity;
 import com.project.ess.entity.AddressRequestEntity;
 import com.project.ess.entity.EmployeeEntity;
 import com.project.ess.entity.approval.AddressRequestStatus;
+import com.project.ess.entity.approval.compositekey.AddressRequestStatusId;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.execptions.ErrorMessage;
@@ -156,6 +158,7 @@ public class AddressService {
         AddressRequestJsonData addressRequestJsonData=new AddressRequestJsonData();
 
         BeanUtils.copyProperties(addressEntity,addressRequestJsonData);
+
         addressRequestJsonData.setNewAdddress(request.getAddress());
         addressRequestJsonData.setNewCity(request.getCity());
         addressRequestJsonData.setNewCountry(request.getCountry());
@@ -164,8 +167,10 @@ public class AddressService {
         addressRequestJsonData.setNewStayStatus(request.getStayStatus());
         addressRequestJsonData.setNewType(request.getType());
         addressRequestJsonData.setNewZipCode(request.getZipCode());
+        BeanUtils.copyProperties(request,addressEntity);
+        addressRepository.save(addressEntity);
 
-
+        addressRequestJsonData.setAddressId(addressEntity.getAddressId());
         addressRequestEntity.setAddressId(addressEntity);
 
         addressRequestEntity.setRequestDateTime(LocalDateTime.now());
@@ -180,6 +185,8 @@ public class AddressService {
         addressRequestEntity.setRequestNo("ADDRESS/REQ/"+ formatDateTime +"/"+addressEntity.getAddressId());
 //        System.out.println(addressRequestJsonData.toString());
 
+
+
         addressRequestRepository.save(addressRequestEntity);
         AddressRequestStatus addressRequestStatus=new AddressRequestStatus();
         addressRequestStatus.setAddressRequestEntity(addressRequestEntity);
@@ -187,12 +194,12 @@ public class AddressService {
 
         addressRequestStatusRepository.save(addressRequestStatus);
 
-        BeanUtils.copyProperties(request,addressEntity);
+
 //        System.out.println(addressEntity);
-        addressRepository.save(addressEntity);
 
 
-        return new ResponseEntity<CustomMessageWithId>(new CustomMessageWithId("Berhasil",false,addressEntity.getAddressId()), HttpStatus.OK);
+
+        return new ResponseEntity<CustomMessageWithId>(new CustomMessageWithId("Submit Edit Address Successfully",false,addressEntity.getAddressId()), HttpStatus.OK);
     }
 
     public List<AddressResponse> getAllListAddressByEmployee(String email){
@@ -246,5 +253,43 @@ public class AddressService {
         );
 
         return addressRequestRepository.getListAddressHistory(employeeEntity);
+    }
+
+    @Transactional
+    public ResponseEntity<CustomMessageWithId> cancelRequestAddressEmployee(String requestNo) throws JsonProcessingException {
+        AddressRequestEntity addressRequestEntity=addressRequestRepository.findByRequestNo(requestNo);
+        AddressRequestStatus addressRequestStatus=addressRequestStatusRepository.findByAddressRequestEntity(addressRequestEntity);
+
+
+
+
+        if(!addressRequestStatus.getStatus().equals("PENDING")){
+            throw new CustomGenericException("Address Request Cant be cancel");
+        }
+
+        ObjectMapper objectMapper=new ObjectMapper();
+
+        AddressRequestJsonData addressRequestJsonData=objectMapper.readValue(addressRequestEntity.getRequestData(),AddressRequestJsonData.class);
+
+        AddressEntity addressEntity=addressRepository.findById(addressRequestEntity.getAddressId().getAddressId()).get();
+
+        if(addressRequestJsonData.getAddressId()==null){
+            addressRequestStatusRepository.deleteAddressRequestStatus(addressRequestEntity);
+            addressRequestRepository.deleteAddressRequestEntitiesByAddressId(addressEntity);
+            addressRepository.deleteAddressEntity(addressEntity.getAddressId());
+        }else{
+            BeanUtils.copyProperties(addressRequestJsonData,addressEntity);
+
+
+            addressRepository.save(addressEntity);
+            addressRequestStatus.setStatus("CANCEL");
+
+            addressRequestStatusRepository.save(addressRequestStatus);
+        }
+
+
+
+
+        return new ResponseEntity<>(new CustomMessageWithId("Address Request Was canceled",false,null),HttpStatus.OK);
     }
 }

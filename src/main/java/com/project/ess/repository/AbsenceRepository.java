@@ -27,4 +27,6 @@ public interface AbsenceRepository extends JpaRepository<AbsenceEntity, Long> {
             "  and current_date>=emp.startDate and current_date<=emp.endDate and ab=abstat.absenceEntity and emp.divisiEntity=de and me.divisiEntity=de" +
             " and me.managerId=:managerId and abstat.status !='PENDING' order by ab.requestDateTime asc")
     public List<AbsenceNeedApproveResponse> getListHistoryAbsence(@Param("managerId")Long managerId);
+
+   public AbsenceEntity findByRequestNo(String requestNo);
 }

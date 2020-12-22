@@ -9,6 +9,7 @@ import com.project.ess.entity.AbsenceEntity;
 import com.project.ess.entity.EmployeeEntity;
 import com.project.ess.entity.approval.AbsenceStatus;
 import com.project.ess.execptions.CustomGenericException;
+import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.execptions.CustomMessageWithRequestNo;
 import com.project.ess.model.AbsenceNeedApproveResponse;
 import com.project.ess.model.AbsenceResponse;
@@ -160,4 +161,21 @@ public class AbsenceService {
 
         return absenceRepository.getListHistoryAbsence(employeeEntity.getEmployeeNo());
     }
+
+    public ResponseEntity<CustomMessageWithId> cancelRequestAbsence(String requestNo){
+
+        AbsenceStatus absenceStatus=absenceStatusRepository.findByAbsenceEntity(absenceRepository.findByRequestNo(requestNo));
+
+        if(!absenceStatus.getStatus().equalsIgnoreCase("PENDING")){
+            throw new CustomGenericException("This Absence Cant be cancel");
+        }
+
+        absenceStatus.setStatus("CANCEL");
+
+        absenceStatusRepository.save(absenceStatus);
+
+        return new ResponseEntity<>(new CustomMessageWithId("Request Cancel Successfully",false,null),HttpStatus.OK);
+    }
+
+
 }

@@ -4,12 +4,13 @@ import com.project.ess.entity.compositekey.AddressRequestId;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity()
 @IdClass(AddressRequestId.class)
 @Table(name = "addressRequest")
-public class AddressRequestEntity {
+public class AddressRequestEntity implements Serializable {
 
     @Id
     @ManyToOne

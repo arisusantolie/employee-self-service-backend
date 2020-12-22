@@ -1,9 +1,11 @@
 package com.project.ess.repository;
 
+import com.project.ess.entity.AddressEntity;
 import com.project.ess.entity.AddressRequestEntity;
 import com.project.ess.entity.EmployeeEntity;
 import com.project.ess.model.AddressNeedApproveResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -38,5 +40,10 @@ public interface AddressRequestRepository extends JpaRepository<AddressRequestEn
             " order by are.requestDateTime asc")
     public List<AddressNeedApproveResponse> getListAddressHistory(@Param("empno") EmployeeEntity empNo);
 
+    public AddressRequestEntity findByRequestNo(String requestNo);
+
+    @Modifying
+    @Query("delete from AddressRequestEntity where addressId=:address")
+    public void deleteAddressRequestEntitiesByAddressId(@Param("address") AddressEntity addressEntity);
 
 }

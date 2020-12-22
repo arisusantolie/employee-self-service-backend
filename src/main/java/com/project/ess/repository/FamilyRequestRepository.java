@@ -2,12 +2,16 @@ package com.project.ess.repository;
 
 import com.project.ess.entity.EmployeeEntity;
 import com.project.ess.entity.FamilyRequestEntity;
+import com.project.ess.entity.approval.FamilyRequestStatus;
 import com.project.ess.model.FamilyNeedApproveResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FamilyRequestRepository extends JpaRepository<FamilyRequestEntity,Long> {
 
@@ -33,4 +37,10 @@ public interface FamilyRequestRepository extends JpaRepository<FamilyRequestEnti
             "where fam=famreq.familyId and famreq=frs.familyRequestEntity and frs.hraId.employeeEntity=:employee and frs.status!='PENDING' " +
             "order by frs.approvedDatetime desc")
     public List<FamilyNeedApproveResponse> getListHistoryFamilyRequest(@Param("employee")EmployeeEntity employeeEntity);
+
+    @Modifying
+    @Query("delete from FamilyRequestEntity where requestNo=:requestNo")
+    public void deleteFamilyRequestByRequestNo(@Param("requestNo") String requestNo);
+
+    public Optional<FamilyRequestEntity>  findByRequestNo(String requestNo);
 }
