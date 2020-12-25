@@ -12,4 +12,5 @@ public interface BenefitBalanceRepository extends JpaRepository<BenefitBalanceEn
     public Optional<BenefitBalanceEntity> findByEmployeeAndPeriod(EmployeeEntity employeeEntity, int period);
 
     public Optional<BenefitBalanceEntity> findByEmployee(EmployeeEntity employeeEntity);
+
 }

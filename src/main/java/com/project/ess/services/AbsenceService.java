@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.ess.dto.AbsenceApproveDTO;
 import com.project.ess.dto.AbsenceDTO;
 import com.project.ess.entity.AbsenceEntity;
 import com.project.ess.entity.EmployeeEntity;
@@ -175,6 +176,24 @@ public class AbsenceService {
         absenceStatusRepository.save(absenceStatus);
 
         return new ResponseEntity<>(new CustomMessageWithId("Request Cancel Successfully",false,null),HttpStatus.OK);
+    }
+
+    public ResponseEntity<CustomMessageWithId> approveRequestAbsence(AbsenceApproveDTO request){
+        AbsenceEntity absenceEntity=absenceRepository.findByRequestNo(request.getRequestNo());
+        AbsenceStatus absenceStatus=absenceStatusRepository.findByAbsenceEntity(absenceEntity);
+
+        if(!absenceStatus.getStatus().equalsIgnoreCase("PENDING")){
+            throw new CustomGenericException("Request Dont Existing");
+        }
+
+        absenceStatus.setStatus(request.getStatus());
+        absenceStatus.setRemark(request.getRemark());
+        absenceStatus.setApprovedDatetime(LocalDateTime.now());
+
+        absenceStatusRepository.save(absenceStatus);
+
+
+        return new ResponseEntity<>(new CustomMessageWithId(request.getStatus().substring(0,1)+request.getStatus().substring(1).toLowerCase()+" Successfully",false,null),HttpStatus.OK);
     }
 
 

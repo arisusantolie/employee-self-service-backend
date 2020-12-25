@@ -2,11 +2,13 @@ package com.project.ess.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.ess.dto.AddressApproveDTO;
 import com.project.ess.dto.AddressDTO;
 import com.project.ess.dto.AddressRequestDTO;
 import com.project.ess.entity.AddressEntity;
 import com.project.ess.entity.AddressRequestEntity;
 import com.project.ess.entity.EmployeeEntity;
+import com.project.ess.entity.HRAdminEntity;
 import com.project.ess.entity.approval.AddressRequestStatus;
 import com.project.ess.entity.approval.compositekey.AddressRequestStatusId;
 import com.project.ess.execptions.CustomGenericException;
@@ -53,6 +55,8 @@ public class AddressService {
 
     @Autowired
     HRAdminRepository hrAdminRepository;
+
+
 
 
     @Transactional
@@ -256,7 +260,7 @@ public class AddressService {
     }
 
     @Transactional
-    public ResponseEntity<CustomMessageWithId> cancelRequestAddressEmployee(String requestNo) throws JsonProcessingException {
+    public ResponseEntity<CustomMessageWithId> cancelRequestAddressEmployee(String requestNo, String status, HRAdminEntity hraId,String remark) throws JsonProcessingException {
         AddressRequestEntity addressRequestEntity=addressRequestRepository.findByRequestNo(requestNo);
         AddressRequestStatus addressRequestStatus=addressRequestStatusRepository.findByAddressRequestEntity(addressRequestEntity);
 
@@ -274,15 +278,32 @@ public class AddressService {
         AddressEntity addressEntity=addressRepository.findById(addressRequestEntity.getAddressId().getAddressId()).get();
 
         if(addressRequestJsonData.getAddressId()==null){
-            addressRequestStatusRepository.deleteAddressRequestStatus(addressRequestEntity);
-            addressRequestRepository.deleteAddressRequestEntitiesByAddressId(addressEntity);
-            addressRepository.deleteAddressEntity(addressEntity.getAddressId());
+
+            if(hraId==null){ //untuk user
+
+                addressRequestStatusRepository.deleteAddressRequestStatus(addressRequestEntity);
+                addressRequestRepository.deleteAddressRequestEntitiesByAddressId(addressEntity);
+                addressRepository.deleteAddressEntity(addressEntity.getAddressId());
+            }else{ //untuk hradmin
+                addressRequestStatus.setStatus(status);
+                addressRequestStatus.setApprovedDatetime(LocalDateTime.now());
+                addressRequestStatus.setHraId(hraId);
+                addressRequestStatus.setRemark(remark);
+                addressRequestStatusRepository.save(addressRequestStatus);
+            }
+
         }else{
             BeanUtils.copyProperties(addressRequestJsonData,addressEntity);
 
 
             addressRepository.save(addressEntity);
-            addressRequestStatus.setStatus("CANCEL");
+
+            addressRequestStatus.setStatus(status);
+            if(hraId!=null){
+                addressRequestStatus.setApprovedDatetime(LocalDateTime.now());
+                addressRequestStatus.setHraId(hraId);
+                addressRequestStatus.setRemark(remark);
+            }
 
             addressRequestStatusRepository.save(addressRequestStatus);
         }
@@ -291,5 +312,37 @@ public class AddressService {
 
 
         return new ResponseEntity<>(new CustomMessageWithId("Address Request Was canceled",false,null),HttpStatus.OK);
+    }
+
+    @Transactional
+    public ResponseEntity<CustomMessageWithId> approveAddressRequest(AddressApproveDTO request,String email) throws JsonProcessingException {
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+        HRAdminEntity hrAdminEntity=hrAdminRepository.findByEmployee(employeeEntity).orElseThrow(
+                ()-> new CustomGenericException("U dont Have access")
+        );
+
+        AddressRequestEntity addressRequestEntity=addressRequestRepository.findByRequestNo(request.getRequestNo());
+        AddressRequestStatus addressRequestStatus=addressRequestStatusRepository.findByAddressRequestEntity(addressRequestEntity);
+
+
+        if(!addressRequestStatus.getStatus().equals("PENDING")){
+            throw new CustomGenericException("Address Request Cant be cancel");
+        }
+
+        if(request.getStatus().equalsIgnoreCase("REJECTED")){
+            cancelRequestAddressEmployee(request.getRequestNo(), request.getStatus(),hrAdminEntity,request.getRemark());
+        }else{
+            addressRequestStatus.setStatus(request.getStatus());
+            addressRequestStatus.setApprovedDatetime(LocalDateTime.now());
+            addressRequestStatus.setRemark(request.getRemark());
+            addressRequestStatus.setHraId(hrAdminEntity);
+            addressRequestStatusRepository.save(addressRequestStatus);
+        }
+
+        return new ResponseEntity<>(new CustomMessageWithId(request.getStatus().substring(0,1)+request.getStatus().substring(1).toLowerCase()+" Request Successfully",false,null),HttpStatus.OK);
+
     }
 }

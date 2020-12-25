@@ -1,7 +1,9 @@
 package com.project.ess.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.project.ess.dto.FamilyRequestApproveDTO;
 import com.project.ess.execptions.CustomMessageWithId;
+import com.project.ess.execptions.CustomMessageWithRequestNo;
 import com.project.ess.model.FamilyNeedApproveResponse;
 import com.project.ess.services.FamilyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,7 @@ public class FamilyRequestController {
     FamilyService familyService;
 
     @PostMapping
-    public ResponseEntity<CustomMessageWithId> updateNewFamily(@RequestParam("family") String family, @RequestParam("file") MultipartFile file, Authentication authentication){
+    public ResponseEntity<CustomMessageWithRequestNo> updateNewFamily(@RequestParam("family") String family, @RequestParam("file") MultipartFile file, Authentication authentication){
 
         return familyService.addOrUpdateFamily(family,file,authentication.getName());
     }
@@ -45,6 +47,11 @@ public class FamilyRequestController {
     @GetMapping("cancel")
     public ResponseEntity<CustomMessageWithId> cancelRequestFamily(@RequestParam("requestNo") String requestNo) throws JsonProcessingException {
 
-        return familyService.cancelFamilyRequest(requestNo);
+        return familyService.cancelFamilyRequest(requestNo,"CANCEL",null,null);
+    }
+
+    @PostMapping("approve")
+    public ResponseEntity<CustomMessageWithId>approveRequestFamily(@RequestBody FamilyRequestApproveDTO request,Authentication authentication) throws JsonProcessingException {
+        return familyService.approveFamilyRequest(request,authentication.getName());
     }
 }

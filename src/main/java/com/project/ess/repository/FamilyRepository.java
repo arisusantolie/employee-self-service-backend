@@ -11,8 +11,10 @@ import java.util.Map;
 
 public interface FamilyRepository extends JpaRepository<FamilyEntity,Long> {
 
-    @Query(value = "SELECT f.*,frs.`status`,fr.`request_date_time` FROM family f, family_request fr,family_request_status frs WHERE f.`family_id`=fr.`family_id` AND fr.`request_no`=frs.request_no\n" +
-            "AND f.`employee_no`=:employee AND (fr.family_id,fr.request_date_time) IN (SELECT family_id,MAX(request_date_time) FROM family_request GROUP BY family_id)",nativeQuery = true)
+    @Query(value = "\n" +
+            "SELECT f.*,frs.`status`,fr.`request_date_time` FROM family f, family_request fr,family_request_status frs WHERE f.`family_id`=fr.`family_id` AND fr.`request_no`=frs.request_no\n" +
+            "AND f.`employee_no`=:employee   AND (fr.family_id,fr.request_date_time) IN \n" +
+            "(SELECT fr.family_id,MAX(fr.request_date_time) FROM family_request fr,family_request_status frs WHERE fr.`family_id`=frs.`family_id` AND frs.`status`=\"APPROVED\" GROUP BY fr.family_id);",nativeQuery = true)
     public List<Map<String,Object>> getFamilyListByEmployeeNo(@Param("employee") Long employeeNo);
 
     @Modifying

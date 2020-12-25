@@ -1,5 +1,6 @@
 package com.project.ess.controllers;
 
+import com.project.ess.dto.AbsenceApproveDTO;
 import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.execptions.CustomMessageWithRequestNo;
 import com.project.ess.model.AbsenceNeedApproveResponse;
@@ -45,10 +46,10 @@ public class AbsenceController {
     }
 
     @PostMapping("/request/approve")
-    public ResponseEntity<CustomMessageWithRequestNo> approveRequestAbsence(Authentication authentication){
+    public ResponseEntity<CustomMessageWithId> approveRequestAbsence(@RequestBody AbsenceApproveDTO request){
 
 
-        return null;
+        return absenceService.approveRequestAbsence(request);
     }
 
     @GetMapping("request/cancel")
@@ -56,6 +57,7 @@ public class AbsenceController {
 
         return absenceService.cancelRequestAbsence(requestNo);
     }
+
 
 
 }

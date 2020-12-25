@@ -42,4 +42,6 @@ public interface AttempdailyRepository extends JpaRepository<AttempdailyEntity,L
     public Optional<AttempdailyEntity>  findByRequestNo(String requestNo);
 
 
+
+
 }

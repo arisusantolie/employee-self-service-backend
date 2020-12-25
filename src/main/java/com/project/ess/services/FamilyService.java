@@ -2,22 +2,20 @@ package com.project.ess.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.ess.dto.AddressRequestDTO;
+
 import com.project.ess.dto.FamilyDTO;
-import com.project.ess.entity.EmployeeEntity;
-import com.project.ess.entity.FamilyEntity;
-import com.project.ess.entity.FamilyRequestEntity;
+import com.project.ess.dto.FamilyRequestApproveDTO;
+import com.project.ess.entity.*;
+import com.project.ess.entity.approval.AddressRequestStatus;
 import com.project.ess.entity.approval.FamilyRequestStatus;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
+import com.project.ess.execptions.CustomMessageWithRequestNo;
 import com.project.ess.model.FamilyNeedApproveResponse;
 import com.project.ess.model.FamilyResponse;
 import com.project.ess.model.UploadFileResponse;
 import com.project.ess.model.jsondata.FamilyRequestJsonData;
-import com.project.ess.repository.EmployeeRepository;
-import com.project.ess.repository.FamilyRepository;
-import com.project.ess.repository.FamilyRequestRepository;
-import com.project.ess.repository.FamilyRequestStatusRepository;
+import com.project.ess.repository.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,8 +51,11 @@ public class FamilyService {
     @Autowired
     FamilyRequestStatusRepository familyRequestStatusRepository;
 
+    @Autowired
+    HRAdminRepository hrAdminRepository;
+
     @Transactional
-    public ResponseEntity<CustomMessageWithId> addOrUpdateFamily(String family, MultipartFile file,String email){
+    public ResponseEntity<CustomMessageWithRequestNo> addOrUpdateFamily(String family, MultipartFile file, String email){
         EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
                 ()->  new CustomGenericException("This Employee Doesnt Exist")
         );
@@ -139,7 +140,7 @@ public class FamilyService {
         familyRequestStatusRepository.save(familyRequestStatus);
 
 
-        return new ResponseEntity<CustomMessageWithId>(new CustomMessageWithId(message,false,familyEntity.getFamilyId()), HttpStatus.OK);
+        return new ResponseEntity<CustomMessageWithRequestNo>(new CustomMessageWithRequestNo(message,false,familyRequestEntity.getRequestNo()), HttpStatus.OK);
     }
 
 
@@ -211,7 +212,7 @@ public class FamilyService {
     }
 
     @Transactional
-    public ResponseEntity<CustomMessageWithId> cancelFamilyRequest(String requestNo) throws JsonProcessingException {
+    public ResponseEntity<CustomMessageWithId> cancelFamilyRequest(String requestNo,String status,HRAdminEntity hrAdminEntity,String remark) throws JsonProcessingException {
         FamilyRequestEntity familyRequestEntity=familyRequestRepository.findByRequestNo(requestNo).orElseThrow(
                 ()-> new CustomGenericException("Family Request Doesnt Exist")
         );
@@ -219,25 +220,78 @@ public class FamilyService {
         FamilyRequestStatus familyRequestStatus=familyRequestStatusRepository.findByFamilyRequestEntity(familyRequestEntity);
 
         if(!familyRequestStatus.getStatus().equalsIgnoreCase("PENDING")){
-            throw new CustomGenericException("Request Cant be Cancel");
+            throw new CustomGenericException("Request Cant be "+status.substring(0,1)+status.substring(1).toLowerCase());
         }
         ObjectMapper objectMapper=new ObjectMapper();
 
         FamilyRequestJsonData familyRequestJsonData=objectMapper.readValue(familyRequestEntity.getRequestData(),FamilyRequestJsonData.class);
+
+
+
         if(familyRequestJsonData.getFamilyId()==null){
-            familyRequestStatusRepository.deleteFamilyRequesStatusByFamilyReqEntity(familyRequestEntity);
-            familyRequestRepository.deleteFamilyRequestByRequestNo(requestNo);
-            familyRepository.deleteFamilyById(familyRequestEntity.getFamilyId().getFamilyId());
+            if(hrAdminEntity==null){ //untuk user pas cancel
+                familyRequestStatusRepository.deleteFamilyRequesStatusByFamilyReqEntity(familyRequestEntity);
+                familyRequestRepository.deleteFamilyRequestByRequestNo(requestNo);
+                familyRepository.deleteFamilyById(familyRequestEntity.getFamilyId().getFamilyId());
+            }else{ //untuk admin
+                familyRequestStatus.setStatus(status);
+                familyRequestStatus.setApprovedDatetime(LocalDateTime.now());
+                familyRequestStatus.setRemark(remark);
+                familyRequestStatus.setHraId(hrAdminEntity);
+                familyRequestStatusRepository.save(familyRequestStatus);
+            }
+
         }else{
             BeanUtils.copyProperties(familyRequestJsonData,familyEntity);
-            familyRequestStatus.setStatus("CANCEL");
+            familyRepository.save(familyEntity);
+            familyRequestStatus.setStatus(status);
+
+            if(hrAdminEntity!=null){
+                familyRequestStatus.setApprovedDatetime(LocalDateTime.now());
+                familyRequestStatus.setRemark(remark);
+                familyRequestStatus.setHraId(hrAdminEntity);
+            }
             familyRequestStatusRepository.save(familyRequestStatus);
 
-            familyRepository.save(familyEntity);
+
         }
 
         return new ResponseEntity<>(new CustomMessageWithId("Family Request Was Canceled",false,null),HttpStatus.OK);
 
+
+    }
+
+    @Transactional
+    public ResponseEntity<CustomMessageWithId> approveFamilyRequest(FamilyRequestApproveDTO request, String email) throws JsonProcessingException {
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+        HRAdminEntity hrAdminEntity=hrAdminRepository.findByEmployee(employeeEntity).orElseThrow(
+                ()-> new CustomGenericException("U dont Have access")
+        );
+
+        FamilyRequestEntity familyRequestEntity=familyRequestRepository.findByRequestNo(request.getRequestNo()).orElseThrow(
+                ()->new CustomGenericException("Request Doesnt exist")
+        );
+        FamilyRequestStatus familyRequestStatus=familyRequestStatusRepository.findByFamilyRequestEntity(familyRequestEntity);
+
+
+        if(!familyRequestStatus.getStatus().equals("PENDING")){
+            throw new CustomGenericException("Family Request Cant be "+request.getStatus().substring(0,1)+request.getStatus().substring(1).toLowerCase());
+        }
+
+        if(request.getStatus().equalsIgnoreCase("REJECTED")){
+            cancelFamilyRequest(request.getRequestNo(), request.getStatus(),hrAdminEntity,request.getRemark());
+        }else{
+            familyRequestStatus.setStatus(request.getStatus());
+            familyRequestStatus.setApprovedDatetime(LocalDateTime.now());
+            familyRequestStatus.setRemark(request.getRemark());
+            familyRequestStatus.setHraId(hrAdminEntity);
+            familyRequestStatusRepository.save(familyRequestStatus);
+        }
+
+        return new ResponseEntity<>(new CustomMessageWithId(request.getStatus().substring(0,1)+request.getStatus().substring(1).toLowerCase()+" Request Successfully",false,null),HttpStatus.OK);
 
     }
 }

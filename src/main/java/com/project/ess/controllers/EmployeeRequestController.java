@@ -1,7 +1,9 @@
 package com.project.ess.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.project.ess.dto.EmployeeRequestApproveDTO;
 import com.project.ess.execptions.CustomMessageWithId;
+import com.project.ess.execptions.CustomMessageWithRequestNo;
 import com.project.ess.model.EmployeeNeedApproveResponse;
 import com.project.ess.model.EmployeeRequestResponse;
 import com.project.ess.services.EmployeeService;
@@ -21,7 +23,7 @@ public class EmployeeRequestController {
     EmployeeService employeeService;
 
     @PostMapping
-    public ResponseEntity<CustomMessageWithId> updateDataEmp(@RequestParam("employee") String employee, @RequestParam(value = "file",required = false) MultipartFile file, Authentication authentication){
+    public ResponseEntity<CustomMessageWithRequestNo> updateDataEmp(@RequestParam("employee") String employee, @RequestParam(value = "file",required = false) MultipartFile file, Authentication authentication){
 
         return employeeService.updateEmployeeData(employee,file,authentication.getName());
     }
@@ -50,6 +52,12 @@ public class EmployeeRequestController {
     public ResponseEntity<CustomMessageWithId> cancelRequestEmpBio(@RequestParam("requestNo") String requestNo) throws JsonProcessingException {
 
 
-        return employeeService.cancelEmployeeRequest(requestNo);
+        return employeeService.cancelEmployeeRequest(requestNo,"CANCEL",null,null);
+    }
+
+    @PostMapping("approve")
+    public ResponseEntity<CustomMessageWithId> approveRequestEmpBio(@RequestBody EmployeeRequestApproveDTO request,Authentication authentication) throws JsonProcessingException {
+
+        return employeeService.approveEmpRequest(request,authentication.getName());
     }
 }

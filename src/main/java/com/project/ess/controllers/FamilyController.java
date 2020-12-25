@@ -1,6 +1,7 @@
 package com.project.ess.controllers;
 
 import com.project.ess.execptions.CustomMessageWithId;
+import com.project.ess.execptions.CustomMessageWithRequestNo;
 import com.project.ess.model.FamilyResponse;
 import com.project.ess.services.FamilyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class FamilyController {
     FamilyService familyService;
 
     @PostMapping
-    public ResponseEntity<CustomMessageWithId> createNewFamily(@RequestParam("family") String family, @RequestParam("file")MultipartFile file, Authentication authentication){
+    public ResponseEntity<CustomMessageWithRequestNo> createNewFamily(@RequestParam("family") String family, @RequestParam("file")MultipartFile file, Authentication authentication){
 
         return familyService.addOrUpdateFamily(family,file,authentication.getName());
     }

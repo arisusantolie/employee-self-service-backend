@@ -47,6 +47,8 @@ public class BenefitBalanceService {
         benefitBalanceEntity.setEmployee(employeeEntity);
         benefitBalanceEntity.setBenefitPlan(benefitPlanEntity);
         benefitBalanceEntity.setBalanceLimit(BigDecimal.valueOf(50000000));
+        benefitBalanceEntity.setBalanceEnd(BigDecimal.valueOf(0));
+        benefitBalanceEntity.setBalanceUsed(BigDecimal.valueOf(0));
 
         LocalDate now = LocalDate.now();
         LocalDate firstDay = now.with(firstDayOfYear());

@@ -4,11 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ess.dto.AddressRequestDTO;
 import com.project.ess.dto.EmployeeDTO;
+import com.project.ess.dto.EmployeeRequestApproveDTO;
 import com.project.ess.dto.EmployeeRequestDTO;
 import com.project.ess.entity.*;
 import com.project.ess.entity.approval.EmployeeRequestStatus;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
+import com.project.ess.execptions.CustomMessageWithRequestNo;
 import com.project.ess.model.EmployeeNeedApproveResponse;
 import com.project.ess.model.EmployeeRequestResponse;
 import com.project.ess.model.EmployeeResponse;
@@ -60,6 +62,9 @@ public class EmployeeService {
     @Autowired
     EmployeeRequestStatusRepository employeeRequestStatusRepository;
 
+    @Autowired
+    HRAdminRepository hrAdminRepository;
+
     @Transactional
     public EmployeeResponse createEmployee(EmployeeDTO request){
         EmployeeEntity newEmployee=new EmployeeEntity();
@@ -94,7 +99,7 @@ public class EmployeeService {
 
 
     @Transactional
-    public ResponseEntity<CustomMessageWithId> updateEmployeeData(String employee, MultipartFile file,String email){
+    public ResponseEntity<CustomMessageWithRequestNo> updateEmployeeData(String employee, MultipartFile file, String email){
         EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
                 ()->  new CustomGenericException("This Employee Doesnt Exist")
         );
@@ -169,7 +174,7 @@ public class EmployeeService {
 
 
 
-        return new ResponseEntity<CustomMessageWithId>(new CustomMessageWithId("Submit Successfully and will be check.",false,employeeEntity.getEmployeeNo()), HttpStatus.OK);
+        return new ResponseEntity<CustomMessageWithRequestNo>(new CustomMessageWithRequestNo("Submit Successfully and will be check.",false,employeeRequestEntity.getRequestNo()), HttpStatus.OK);
     }
 
 
@@ -239,7 +244,7 @@ public class EmployeeService {
     }
 
     @Transactional
-    public ResponseEntity<CustomMessageWithId> cancelEmployeeRequest(String requestNo) throws JsonProcessingException {
+    public ResponseEntity<CustomMessageWithId> cancelEmployeeRequest(String requestNo,String status,HRAdminEntity hraId,String remark) throws JsonProcessingException {
 
 
         EmployeeRequestEntity employeeRequestEntity=employeeRequestRepository.findByRequestNo(requestNo);
@@ -247,7 +252,7 @@ public class EmployeeService {
         EmployeeRequestStatus employeeRequestStatus=employeeRequestStatusRepository.findByEmployeeRequestEntity(employeeRequestEntity);
 
         if(!employeeRequestStatus.getStatus().equalsIgnoreCase("PENDING")){
-            throw new CustomGenericException("This Request Cant Be cancel");
+            throw new CustomGenericException("This Request Cant Be "+status.substring(0,1)+status.substring(1).toLowerCase());
         }
 
         ObjectMapper objectMapper=new ObjectMapper();
@@ -257,7 +262,13 @@ public class EmployeeService {
 
         BeanUtils.copyProperties(employeeRequestJsonData,employeeEntity);
 
-        employeeRequestStatus.setStatus("CANCEL");
+        employeeRequestStatus.setStatus(status);
+
+        if(hraId!=null){
+            employeeRequestStatus.setApprovedDatetime(LocalDateTime.now());
+            employeeRequestStatus.setHraId(hraId);
+            employeeRequestStatus.setRemark(remark);
+        }
 
 
         employeeRequestStatusRepository.save(employeeRequestStatus);
@@ -265,7 +276,41 @@ public class EmployeeService {
         employeeRepository.save(employeeEntity);
 
 
-        return new ResponseEntity<>(new CustomMessageWithId("Request Was Canceled",false,null),HttpStatus.OK);
+        return new ResponseEntity<>(new CustomMessageWithId("Request Was "+status.substring(0,1)+status.substring(1).toLowerCase(),false,null),HttpStatus.OK);
+    }
+
+
+    @Transactional
+    public ResponseEntity<CustomMessageWithId> approveEmpRequest(EmployeeRequestApproveDTO request,String email) throws JsonProcessingException {
+        EmployeeRequestEntity employeeRequestEntity=employeeRequestRepository.findByRequestNo(request.getRequestNo());
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->new CustomGenericException("This Employee Doesnt Exist")
+        );
+        EmployeeRequestStatus employeeRequestStatus=employeeRequestStatusRepository.findByEmployeeRequestEntity(employeeRequestEntity);
+
+
+
+
+        HRAdminEntity hrAdminEntity=hrAdminRepository.findByEmployee(employeeEntity).orElseThrow(
+                ()->new CustomGenericException("You Dont have Access To this Roles")
+        );
+
+        if(!employeeRequestStatus.getStatus().equalsIgnoreCase("PENDING")){
+            throw new CustomGenericException("This Request Cant Be "+request.getStatus().substring(0,1)+request.getStatus().substring(1).toLowerCase());
+        }
+
+        if(request.getStatus().equalsIgnoreCase("REJECTED")){
+            cancelEmployeeRequest(request.getRequestNo(),request.getStatus(),hrAdminEntity,request.getRemark());
+        }else{
+            employeeRequestStatus.setStatus(request.getStatus());
+            employeeRequestStatus.setRemark(request.getRemark());
+            employeeRequestStatus.setHraId(hrAdminEntity);
+            employeeRequestStatus.setApprovedDatetime(LocalDateTime.now());
+            employeeRequestStatusRepository.save(employeeRequestStatus);
+        }
+
+        return new ResponseEntity<>(new CustomMessageWithId(request.getStatus().substring(0,1)+request.getStatus().substring(1).toLowerCase()+" Successfully",false,null),HttpStatus.OK);
+
     }
 
 }

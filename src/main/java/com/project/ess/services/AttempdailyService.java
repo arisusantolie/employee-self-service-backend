@@ -1,8 +1,10 @@
 package com.project.ess.services;
 
+import com.project.ess.dto.AttempdailyApproveDTO;
 import com.project.ess.dto.AttempdailyDTO;
 import com.project.ess.entity.AttempdailyEntity;
 import com.project.ess.entity.EmployeeEntity;
+import com.project.ess.entity.ManagerEntity;
 import com.project.ess.entity.approval.AttempdailyStatus;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
@@ -11,6 +13,7 @@ import com.project.ess.model.AttempdailyNeedResponse;
 import com.project.ess.model.TimesheetResponse;
 import com.project.ess.projection.EmploymentBaseProj;
 import com.project.ess.repository.*;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -154,5 +157,44 @@ public class AttempdailyService {
         attempdailyRepository.delete(attempdailyEntity);
 
         return new ResponseEntity<>(new CustomMessageWithId("Attempdaily was canceled",false,null),HttpStatus.OK);
+    }
+
+    public ResponseEntity<CustomMessageWithId> approveRequestAttempdaily(AttempdailyApproveDTO request,String email){
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+
+        ManagerEntity managerEntity=managerRepository.findByEmployee(employeeEntity).orElseThrow(
+                ()-> new CustomGenericException("You Dont Have Manager Roles Access")
+        );
+
+        AttempdailyEntity attempdailyEntity=attempdailyRepository.findByRequestNo(request.getRequestNo()).orElseThrow(
+                ()->new CustomGenericException("Request Doesnt Exist")
+        );
+
+        AttempdailyStatus attempdailyForChecking=attempdailyStatusRepository.getDataAttempdailyForApprove(request.getRequestNo(),attempdailyEntity.getEmployeeNo().getEmployeeNo());
+        AttempdailyStatus attempdailyStatus=attempdailyStatusRepository.findByAttempdailyEntity(attempdailyEntity);
+
+        if(request.getStatus().equalsIgnoreCase("APPROVED") && attempdailyForChecking.getStatus().equalsIgnoreCase("REJECTED")){
+            throw new CustomGenericException("This Request Must Be Rejected, Because The Other One Request Was Rejected");
+        }else if(request.getStatus().equalsIgnoreCase("REJECTED") && attempdailyForChecking.getStatus().equalsIgnoreCase("APPROVED")){
+            throw new CustomGenericException("This Request Must Be Approved, Because The Other One Request Was Approved");
+        }
+
+
+        if(!attempdailyStatus.getStatus().equalsIgnoreCase("PENDING")){
+            throw new CustomGenericException("This Request Doesn't Exist");
+        }
+        attempdailyStatus.setStatus(request.getStatus());
+        attempdailyStatus.setApprovedDatetime(LocalDateTime.now());
+        attempdailyStatus.setManagerId(managerEntity);
+        attempdailyStatus.setRemark(request.getRemark());
+
+
+        attempdailyStatusRepository.save(attempdailyStatus);
+
+        return new ResponseEntity<>(new CustomMessageWithId(request.getStatus().substring(0,1)+request.getStatus().substring(1).toLowerCase()+" Successfully",false,null),HttpStatus.OK);
+
     }
 }

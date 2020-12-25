@@ -1,5 +1,6 @@
 package com.project.ess.controllers;
 
+import com.project.ess.dto.BenefitApproveDTO;
 import com.project.ess.execptions.CustomMessageWithId;
 import com.project.ess.execptions.CustomMessageWithRequestNo;
 import com.project.ess.model.BenefitNeedApproveResponse;
@@ -47,5 +48,13 @@ public class BenefitRequestController {
     @GetMapping("cancel")
     public ResponseEntity<CustomMessageWithId> cancelRequestBenefit(@RequestParam("requestNo") String requestNo){
         return benefitRequestService.cancelRequestBenefitClaim(requestNo);
+    }
+
+    @PostMapping("approve")
+    public ResponseEntity<CustomMessageWithId> approveRequestBenefit(@RequestBody BenefitApproveDTO request,Authentication authentication){
+
+
+
+        return benefitRequestService.approveRequestBenefitClaim(request,authentication.getName());
     }
 }

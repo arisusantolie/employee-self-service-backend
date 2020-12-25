@@ -1,5 +1,6 @@
 package com.project.ess.controllers;
 
+import com.project.ess.dto.AttempdailyApproveDTO;
 import com.project.ess.dto.AttempdailyDTO;
 import com.project.ess.entity.AttempdailyEntity;
 import com.project.ess.entity.EmployeeEntity;
@@ -63,5 +64,10 @@ public class AttempdailyController {
     public ResponseEntity<CustomMessageWithId> cancelRequestAttempdaily(@RequestParam("requestNo") String requestNo){
 
         return attempdailyService.cancelRequestAttempdaily(requestNo);
+    }
+
+    @PostMapping("request/approve")
+    public ResponseEntity<CustomMessageWithId> approveRequestAttempdaily(@RequestBody AttempdailyApproveDTO request,Authentication authentication){
+        return attempdailyService.approveRequestAttempdaily(request,authentication.getName())   ;
     }
 }

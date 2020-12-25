@@ -2,10 +2,12 @@ package com.project.ess.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ess.dto.AddressRequestDTO;
+import com.project.ess.dto.BenefitApproveDTO;
 import com.project.ess.dto.BenefitRequestDTO;
 import com.project.ess.entity.BenefitBalanceEntity;
 import com.project.ess.entity.BenefitRequestEntity;
 import com.project.ess.entity.EmployeeEntity;
+import com.project.ess.entity.ManagerEntity;
 import com.project.ess.entity.approval.BenefitRequestStatus;
 import com.project.ess.execptions.CustomGenericException;
 import com.project.ess.execptions.CustomMessageWithId;
@@ -170,5 +172,45 @@ public class BenefitRequestService {
         benefitRequestStatusRepository.save(benefitRequestStatus);
 
         return new ResponseEntity<>(new CustomMessageWithId("Claim Was Canceled",false,null),HttpStatus.OK);
+    }
+
+    @Transactional
+    public ResponseEntity<CustomMessageWithId> approveRequestBenefitClaim(BenefitApproveDTO request,String email){
+        EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(
+                ()->  new CustomGenericException("This Employee Doesnt Exist")
+        );
+
+
+        ManagerEntity managerEntity=managerRepository.findByEmployee(employeeEntity).orElseThrow(
+                ()-> new CustomGenericException("You Dont Have Manager Roles Access")
+        );
+
+        BenefitRequestEntity benefitRequestEntity=benefitRequestRepository.findByRequestNo(request.getRequestNo()).orElseThrow(
+                ()->new CustomGenericException("Benefit Request Doesnt Exist")
+        );
+        BenefitRequestStatus benefitRequestStatus=benefitRequestStatusRepository.findByBenefitRequestEntity(benefitRequestEntity);
+
+        if(!benefitRequestStatus.getStatus().equalsIgnoreCase("PENDING")){
+            throw new CustomGenericException("This Request Doesnt exit");
+        }
+
+        if(request.getStatus().equalsIgnoreCase("APPROVED")){
+            BenefitBalanceEntity benefitBalanceEntity=benefitBalanceRepository.findById(benefitRequestEntity.getBenefitBalanceId().getBenefitBalanceId()).orElseThrow(
+                    ()-> new CustomGenericException("This Request Doesnt Have balance")
+            );
+
+            benefitBalanceEntity.setBalanceUsed(benefitBalanceEntity.getBalanceUsed().add(benefitRequestEntity.getAmount()));
+            benefitBalanceEntity.setBalanceEnd(benefitBalanceEntity.getBalanceLimit().subtract(benefitBalanceEntity.getBalanceUsed()));
+            benefitBalanceRepository.save(benefitBalanceEntity);
+        }
+
+        benefitRequestStatus.setStatus(request.getStatus());
+        benefitRequestStatus.setApprovedDatetime(LocalDateTime.now());
+        benefitRequestStatus.setRemark(request.getRemark());
+
+        benefitRequestStatusRepository.save(benefitRequestStatus);
+
+        return new ResponseEntity<>(new CustomMessageWithId(request.getStatus().substring(0,1)+request.getStatus().substring(1).toLowerCase()+" Successfully"
+        ,false,null ),HttpStatus.OK);
     }
 }
