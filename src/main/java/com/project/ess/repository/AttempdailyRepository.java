@@ -1,5 +1,6 @@
 package com.project.ess.repository;
 
+import com.project.ess.dto.AttempdailyRequestDTO;
 import com.project.ess.entity.AttempdailyEntity;
 import com.project.ess.entity.EmployeeEntity;
 import com.project.ess.model.AttempdailyNeedResponse;
@@ -7,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.parameters.P;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,7 +20,9 @@ public interface AttempdailyRepository extends JpaRepository<AttempdailyEntity,L
     @Query(value = "select * from attempdaily where employee_no=:employeeNo and type=:type and date(actual_time)=:date",nativeQuery = true)
     public Optional<AttempdailyEntity> findByEmployeeNoAndActualTimeAndType(@Param("employeeNo") Long employeeNo,@Param("type") String type,@Param("date") LocalDate date);
 
-    public List<AttempdailyEntity> findByEmployeeNoOrderByActualTime(EmployeeEntity employeeEntity);
+    @Query("select new com.project.ess.dto.AttempdailyRequestDTO(u.type,u.actual_lng,u.actual_lat,u.isOutOffice,u.purpose,u.remark,u.actualTime,u.requestNo,ats.status) " +
+            "from AttempdailyEntity u,AttempdailyStatus ats where u=ats.attempdailyEntity and u.employeeNo=:employee order by u.actualTime desc")
+    public List<AttempdailyRequestDTO> findByEmployeeNoOrderByActualTime(@Param("employee") EmployeeEntity employeeEntity);
 //
 //    @Query(value = "select * from attempdaily where month(actual_time)=:month and year(actual_time)=:year",nativeQuery = true)
 //    public List<AttempdailyEntity> getTimeSheet(@Param("month") int month, @Param("year") int year);

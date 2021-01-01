@@ -2,6 +2,7 @@ package com.project.ess.services;
 
 import com.project.ess.dto.AttempdailyApproveDTO;
 import com.project.ess.dto.AttempdailyDTO;
+import com.project.ess.dto.AttempdailyRequestDTO;
 import com.project.ess.entity.AttempdailyEntity;
 import com.project.ess.entity.EmployeeEntity;
 import com.project.ess.entity.ManagerEntity;
@@ -91,7 +92,7 @@ public class AttempdailyService {
 
     }
 
-    public List<AttempdailyEntity> getListByEmp(String email){
+    public List<AttempdailyRequestDTO> getListByEmp(String email){
 
 
         EmployeeEntity employeeEntity=employeeRepository.findByEmail(email).orElseThrow(

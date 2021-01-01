@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ess.dto.AbsenceApproveDTO;
 import com.project.ess.dto.AbsenceDTO;
+import com.project.ess.dto.AbsenceStatusDTO;
 import com.project.ess.entity.AbsenceEntity;
 import com.project.ess.entity.EmployeeEntity;
 import com.project.ess.entity.approval.AbsenceStatus;
@@ -125,7 +126,7 @@ public class AbsenceService {
         ModelMapper modelMapper=new ModelMapper();
 
         absenceEntityList.forEach(x->{
-            AbsenceStatus absenceStatus=absenceStatusRepository.findByAbsenceEntity(x);
+            AbsenceStatusDTO absenceStatus=absenceStatusRepository.findByAbsenceEntityDTO(x);
             String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("api/v1/downloadFile/")
                     .path(x.getFileName())

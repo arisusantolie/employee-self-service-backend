@@ -2,6 +2,7 @@ package com.project.ess.controllers;
 
 import com.project.ess.dto.AttempdailyApproveDTO;
 import com.project.ess.dto.AttempdailyDTO;
+import com.project.ess.dto.AttempdailyRequestDTO;
 import com.project.ess.entity.AttempdailyEntity;
 import com.project.ess.entity.EmployeeEntity;
 import com.project.ess.execptions.CustomGenericException;
@@ -39,7 +40,7 @@ public class AttempdailyController {
     }
 
     @GetMapping("/request")
-    public List<AttempdailyEntity> getListAttempEmp(Authentication authentication){
+    public List<AttempdailyRequestDTO> getListAttempEmp(Authentication authentication){
 
         return attempdailyService.getListByEmp(authentication.getName());
     }

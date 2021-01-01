@@ -29,7 +29,7 @@ public class FamilyRequestController {
     @GetMapping()
     public List<FamilyNeedApproveResponse> getListFamilyRequest(Authentication authentication){
 
-        return familyService.getListFamNeedApprove(authentication.getName());
+        return familyService.getListFamilyRequest(authentication.getName());
     }
 
     @GetMapping("/needapprove")
