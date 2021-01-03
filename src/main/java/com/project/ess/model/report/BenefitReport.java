@@ -10,7 +10,7 @@ public class BenefitReport {
     private String claimType;
     private String benefitReason;
     private String amount;
-    private String requestDateTime;
+    private String requestDatetime;
     private String remarkRequest;
     private String status;
     private String actionBy;
@@ -81,16 +81,16 @@ public class BenefitReport {
         this.amount = amount;
     }
 
-    public String getRequestDateTime() {
-        return requestDateTime;
-    }
-
-    public void setRequestDateTime(String requestDateTime) {
-        this.requestDateTime = requestDateTime;
-    }
-
     public String getRemarkRequest() {
         return remarkRequest;
+    }
+
+    public String getRequestDatetime() {
+        return requestDatetime;
+    }
+
+    public void setRequestDatetime(String requestDatetime) {
+        this.requestDatetime = requestDatetime;
     }
 
     public void setRemarkRequest(String remarkRequest) {
