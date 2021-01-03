@@ -3,10 +3,7 @@ package com.project.ess.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ess.model.report.*;
-import com.project.ess.repository.AbsenceRepository;
-import com.project.ess.repository.AttempdailyRepository;
-import com.project.ess.repository.BenefitRequestRepository;
-import com.project.ess.repository.EmployeeRequestRepository;
+import com.project.ess.repository.*;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -46,6 +43,12 @@ public class ReportService {
 
     @Autowired
     EmployeeRequestRepository employeeRequestRepository;
+
+    @Autowired
+    AddressRepository addressRepository;
+
+    @Autowired
+    FamilyRepository familyRepository;
 
 
     @Value("${report.location}")
@@ -278,40 +281,166 @@ public class ReportService {
         employeeReportResult.setResult(employeeReportList);
 
         ObjectMapper newObjectMapper=new ObjectMapper();
-        String writeValueAsString = newObjectMapper.writeValueAsString(employeeReportResult);
-        System.out.println(writeValueAsString);
+        String writeValueAsString = newObjectMapper.writeValueAsString(employeeReportList);
+//        System.out.println(writeValueAsString);
 
-//        JasperReport report = (JasperReport) JRLoader.loadObject(new File(reportLocation+"BenefitReport.jasper"));
-//
-//        final JsonDataSource jsonSource= new JsonDataSource(new ByteArrayInputStream(writeValueAsString.getBytes()));
-//
-//        final Map<String, Object> parameters = new HashMap<>();
-//        parameters.put("createdBy", "Ari Susanto");
-//        //response.setHeader("Authorization", "Bearer db0dca62-d56c-4efe-b28a-9ba05327285f");
-//        // Filling the report with the employee data and additional parameters information.
-//        final JasperPrint print = JasperFillManager.fillReport(report, parameters, jsonSource);
-//        SimpleXlsxReportConfiguration configuration = new SimpleXlsxReportConfiguration();
-//        //configuration.setOnePagePerSheet(true);
-//        configuration.setIgnoreGraphics(false);
-//
-//        ServletOutputStream responseOutputStream = httpServletResponse.getOutputStream();
-//        //ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        //response.setContentType("application/x-msdownload");
-//        //response.setHeader("Content-Disposition", "attachment; filename=" + "test.pdf");
-//        httpServletResponse.setContentType("application/x-msdownload");
-//        httpServletResponse.setHeader("Content-Disposition", "attachment; filename=" + "benefitreport.xlsx");
-//        //JasperExportManager.exportReportToPdfStream(print, responseOutputStream);
-//
-//
-//        Exporter exporter = new JRXlsxExporter();
-//        exporter.setExporterInput(new SimpleExporterInput(print));
-//        exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(responseOutputStream));
-//        exporter.setConfiguration(configuration);
-//        exporter.exportReport();
-//        //byteArrayOutputStream.writeTo(fileOutputStream);
-//
-//        responseOutputStream.flush();
-//        responseOutputStream.close();
+        JasperReport report = (JasperReport) JRLoader.loadObject(new File(reportLocation+"EmployeeReport.jasper"));
+
+        final JsonDataSource jsonSource= new JsonDataSource(new ByteArrayInputStream(writeValueAsString.getBytes()));
+
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("createdBy", "Ari Susanto");
+        //response.setHeader("Authorization", "Bearer db0dca62-d56c-4efe-b28a-9ba05327285f");
+        // Filling the report with the employee data and additional parameters information.
+        final JasperPrint print = JasperFillManager.fillReport(report, parameters, jsonSource);
+        SimpleXlsxReportConfiguration configuration = new SimpleXlsxReportConfiguration();
+        //configuration.setOnePagePerSheet(true);
+        configuration.setIgnoreGraphics(false);
+
+        ServletOutputStream responseOutputStream = httpServletResponse.getOutputStream();
+        //ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        //response.setContentType("application/x-msdownload");
+        //response.setHeader("Content-Disposition", "attachment; filename=" + "test.pdf");
+        httpServletResponse.setContentType("application/x-msdownload");
+        httpServletResponse.setHeader("Content-Disposition", "attachment; filename=" + "employeereport.xlsx");
+        //JasperExportManager.exportReportToPdfStream(print, responseOutputStream);
+
+
+        Exporter exporter = new JRXlsxExporter();
+        exporter.setExporterInput(new SimpleExporterInput(print));
+        exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(responseOutputStream));
+        exporter.setConfiguration(configuration);
+        exporter.exportReport();
+        //byteArrayOutputStream.writeTo(fileOutputStream);
+
+        responseOutputStream.flush();
+        responseOutputStream.close();
+
+    }
+
+    public void getAddressReport(String startDate, String endDate, String status, Long employeeNo, HttpServletResponse httpServletResponse) throws IOException, JRException {
+
+        List<AddressReport> addressReportList =new ArrayList<>();
+
+        addressRepository.getAddressReport(startDate,endDate,status,employeeNo).forEach(x->{
+            AddressReport addressReport=new AddressReport();
+
+            addressReport.setEmployeeNo(x.get("employee_no").toString());
+            addressReport.setFullName(x.get("fullname").toString());
+            addressReport.setPosition(x.get("position").toString());
+            addressReport.setRequestNo(x.get("request_no").toString());
+            addressReport.setRequestDatetime(x.get("request_date_time")==null ? "-" : x.get("request_date_time").toString());
+//            addressReport.setRemarkRequest(x.get("remark_request")==null ? "-" : x.get("remark_request").toString());
+            addressReport.setStatus(x.get("status").toString());
+            addressReport.setActionBy(x.get("action_by").toString());
+            addressReport.setApprovedDatetime(x.get("approved_datetime")==null ? "-" :x.get("approved_datetime").toString());
+            addressReport.setRemarkApproved(x.get("remark_approved")==null ? "-" : x.get("remark_approved").toString());
+            addressReportList.add(addressReport);
+
+        });
+
+
+        AddressReportResult addressReportResult=new AddressReportResult();
+        addressReportResult.setResult(addressReportList);
+
+        ObjectMapper newObjectMapper=new ObjectMapper();
+        String writeValueAsString = newObjectMapper.writeValueAsString(addressReportList);
+//        System.out.println(writeValueAsString);
+
+        JasperReport report = (JasperReport) JRLoader.loadObject(new File(reportLocation+"AddressReport.jasper"));
+
+        final JsonDataSource jsonSource= new JsonDataSource(new ByteArrayInputStream(writeValueAsString.getBytes()));
+
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("createdBy", "Ari Susanto");
+        //response.setHeader("Authorization", "Bearer db0dca62-d56c-4efe-b28a-9ba05327285f");
+        // Filling the report with the employee data and additional parameters information.
+        final JasperPrint print = JasperFillManager.fillReport(report, parameters, jsonSource);
+        SimpleXlsxReportConfiguration configuration = new SimpleXlsxReportConfiguration();
+        //configuration.setOnePagePerSheet(true);
+        configuration.setIgnoreGraphics(false);
+
+        ServletOutputStream responseOutputStream = httpServletResponse.getOutputStream();
+        //ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        //response.setContentType("application/x-msdownload");
+        //response.setHeader("Content-Disposition", "attachment; filename=" + "test.pdf");
+        httpServletResponse.setContentType("application/x-msdownload");
+        httpServletResponse.setHeader("Content-Disposition", "attachment; filename=" + "addressreport.xlsx");
+        //JasperExportManager.exportReportToPdfStream(print, responseOutputStream);
+
+
+        Exporter exporter = new JRXlsxExporter();
+        exporter.setExporterInput(new SimpleExporterInput(print));
+        exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(responseOutputStream));
+        exporter.setConfiguration(configuration);
+        exporter.exportReport();
+        //byteArrayOutputStream.writeTo(fileOutputStream);
+
+        responseOutputStream.flush();
+        responseOutputStream.close();
+
+    }
+
+    public void getFamilyReport(String startDate, String endDate, String status, Long employeeNo, HttpServletResponse httpServletResponse) throws IOException, JRException {
+
+        List<FamilyReport> familyReportList =new ArrayList<>();
+
+        familyRepository.getFamilyReport(startDate,endDate,status,employeeNo).forEach(x->{
+            FamilyReport familyReport=new FamilyReport();
+
+            familyReport.setEmployeeNo(x.get("employee_no").toString());
+            familyReport.setFullName(x.get("fullname").toString());
+            familyReport.setPosition(x.get("position").toString());
+            familyReport.setRequestNo(x.get("request_no").toString());
+            familyReport.setRequestDatetime(x.get("request_date_time")==null ? "-" : x.get("request_date_time").toString());
+//            addressReport.setRemarkRequest(x.get("remark_request")==null ? "-" : x.get("remark_request").toString());
+            familyReport.setStatus(x.get("status").toString());
+            familyReport.setActionBy(x.get("action_by").toString());
+            familyReport.setApprovedDatetime(x.get("approved_datetime")==null ? "-" :x.get("approved_datetime").toString());
+            familyReport.setRemarkApproved(x.get("remark_approved")==null ? "-" : x.get("remark_approved").toString());
+            familyReportList.add(familyReport);
+
+        });
+
+
+        FamilyReportResult familyReportResult=new FamilyReportResult();
+        familyReportResult.setResult(familyReportList);
+
+        ObjectMapper newObjectMapper=new ObjectMapper();
+        String writeValueAsString = newObjectMapper.writeValueAsString(familyReportList);
+//        System.out.println(writeValueAsString);
+
+        JasperReport report = (JasperReport) JRLoader.loadObject(new File(reportLocation+"FamilyReport.jasper"));
+
+        final JsonDataSource jsonSource= new JsonDataSource(new ByteArrayInputStream(writeValueAsString.getBytes()));
+
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("createdBy", "Ari Susanto");
+        //response.setHeader("Authorization", "Bearer db0dca62-d56c-4efe-b28a-9ba05327285f");
+        // Filling the report with the employee data and additional parameters information.
+        final JasperPrint print = JasperFillManager.fillReport(report, parameters, jsonSource);
+        SimpleXlsxReportConfiguration configuration = new SimpleXlsxReportConfiguration();
+        //configuration.setOnePagePerSheet(true);
+        configuration.setIgnoreGraphics(false);
+
+        ServletOutputStream responseOutputStream = httpServletResponse.getOutputStream();
+        //ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        //response.setContentType("application/x-msdownload");
+        //response.setHeader("Content-Disposition", "attachment; filename=" + "test.pdf");
+        httpServletResponse.setContentType("application/x-msdownload");
+        httpServletResponse.setHeader("Content-Disposition", "attachment; filename=" + "familyreport.xlsx");
+        //JasperExportManager.exportReportToPdfStream(print, responseOutputStream);
+
+
+        Exporter exporter = new JRXlsxExporter();
+        exporter.setExporterInput(new SimpleExporterInput(print));
+        exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(responseOutputStream));
+        exporter.setConfiguration(configuration);
+        exporter.exportReport();
+        //byteArrayOutputStream.writeTo(fileOutputStream);
+
+        responseOutputStream.flush();
+        responseOutputStream.close();
 
     }
 
