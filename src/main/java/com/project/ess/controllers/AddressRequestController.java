@@ -46,7 +46,7 @@ public class AddressRequestController {
     @GetMapping("cancel")
     public ResponseEntity<CustomMessageWithId> cancelRequestAddress(@RequestParam("requestNo") String requestNo) throws JsonProcessingException {
 
-        return addressService.cancelRequestAddressEmployee(requestNo,"CANCEL",null,null);
+        return addressService.cancelRequestAddressEmployee(requestNo,"CANCELED",null,null);
     }
 
     @PostMapping("approve")

@@ -172,7 +172,7 @@ public class AbsenceService {
             throw new CustomGenericException("This Absence Cant be cancel");
         }
 
-        absenceStatus.setStatus("CANCEL");
+        absenceStatus.setStatus("CANCELED");
 
         absenceStatusRepository.save(absenceStatus);
 

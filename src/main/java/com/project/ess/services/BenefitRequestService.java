@@ -168,7 +168,7 @@ public class BenefitRequestService {
             throw new CustomGenericException("Claim Request Cant Be cancel");
         }
 
-        benefitRequestStatus.setStatus("CANCEL");
+        benefitRequestStatus.setStatus("CANCELED");
         benefitRequestStatusRepository.save(benefitRequestStatus);
 
         return new ResponseEntity<>(new CustomMessageWithId("Claim Was Canceled",false,null),HttpStatus.OK);

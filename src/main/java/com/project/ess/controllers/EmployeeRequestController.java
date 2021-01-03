@@ -52,7 +52,7 @@ public class EmployeeRequestController {
     public ResponseEntity<CustomMessageWithId> cancelRequestEmpBio(@RequestParam("requestNo") String requestNo) throws JsonProcessingException {
 
 
-        return employeeService.cancelEmployeeRequest(requestNo,"CANCEL",null,null);
+        return employeeService.cancelEmployeeRequest(requestNo,"CANCELED",null,null);
     }
 
     @PostMapping("approve")

@@ -47,7 +47,7 @@ public class FamilyRequestController {
     @GetMapping("cancel")
     public ResponseEntity<CustomMessageWithId> cancelRequestFamily(@RequestParam("requestNo") String requestNo) throws JsonProcessingException {
 
-        return familyService.cancelFamilyRequest(requestNo,"CANCEL",null,null);
+        return familyService.cancelFamilyRequest(requestNo,"CANCELED",null,null);
     }
 
     @PostMapping("approve")
