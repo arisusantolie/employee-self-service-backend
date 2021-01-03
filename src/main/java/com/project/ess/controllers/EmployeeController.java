@@ -46,4 +46,9 @@ public class EmployeeController {
 
         return employeeService.getMyteamByEmpNo(authentication.getName());
     }
+
+    @GetMapping("allemployee")
+    public List<EmployeeEntity> getAllEmployee(){
+        return employeeRepository.getAllEmployee();
+    }
 }

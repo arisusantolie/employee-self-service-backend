@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface BenefitRequestRepository extends JpaRepository<BenefitRequestEntity,Long> {
@@ -40,4 +41,15 @@ public interface BenefitRequestRepository extends JpaRepository<BenefitRequestEn
 
 
     public Optional<BenefitRequestEntity>  findByRequestNo(String requestNo);
+
+
+    @Query(value ="SELECT emp.`employee_no`,CONCAT(emp.`first_name`,\" \",emp.last_name) AS fullname,employ.`position`,br.`request_no`,br.`transaction_date`,bp.`name` claim_type,br.`benefit_reason`,br.`amount`,br.`request_date_time`,\n" +
+            "br.`remark` remark_request,brs.`status`,CONCAT(empmgr.first_name,\" \",empmgr.last_name) action_by,brs.approved_datetime,brs.`remark` remark_approved\n" +
+            "FROM benefit_plan bp,benefit_balance bb, benefit_request br,`benefit_request_status` brs ,employee emp,employee empmgr,manager mgr,employment employ,divisi dv\n" +
+            "WHERE br.`benefit_balance_id`=bb.`benefit_balance_id` AND bb.`benefit_plan_id`=bp.`benefit_plan_id` AND br.`request_no`=brs.`request_no` \n" +
+            "AND bb.`employee_no`=emp.`employee_no` AND brs.`manager_id`=mgr.`manager_id` AND mgr.`employee_no`=empmgr.`employee_no` \n" +
+            "AND bb.`employee_no`=employ.`employee_no` AND DATE_FORMAT(br.`request_date_time`,\"%Y-%m-%d\")>=employ.start_date AND DATE_FORMAT(br.`request_date_time`,\"%Y-%m-%d\")<=employ.end_date AND employ.`divisi_id`=dv.`divisi_id` AND\n" +
+            "DATE_FORMAT(br.`request_date_time` ,\"%Y-%m-%d\") BETWEEN :startDate AND :endDate \n" +
+            "AND brs.`status`=nvl(:status,brs.`status`) AND bb.`employee_no`=nvl(:employeeNo,bb.`employee_no`); " ,nativeQuery = true)
+    public List<Map<String,Object>> getBenefitReport(@Param("startDate") String startDate,@Param("endDate") String endDate,@Param("status") String status,@Param("employeeNo") Long employeeNo);
 }

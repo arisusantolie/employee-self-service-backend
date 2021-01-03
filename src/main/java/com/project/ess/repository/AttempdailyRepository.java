@@ -46,6 +46,16 @@ public interface AttempdailyRepository extends JpaRepository<AttempdailyEntity,L
     public Optional<AttempdailyEntity>  findByRequestNo(String requestNo);
 
 
+    @Query(value = "SELECT emp.`employee_no`,CONCAT(emp.`first_name`,\" \",emp.last_name) AS fullname,employ.`position`, DATE_FORMAT(atp.`actual_time`,\"%Y-%m-%d\") date_check, DATE_FORMAT(atp.`actual_time`,\"%H:%i\") clock\n" +
+            ",atp.`request_no`,atp.`remark` remark_request,atps.status,CONCAT(empmgr.first_name,\" \",empmgr.last_name) action_by,atps.approved_datetime,atps.remark remark_approved \n" +
+            "FROM attempdaily atp,attempdaily_status atps,employee emp,employee empmgr,manager mgr,employment employ,divisi dv\n" +
+            "WHERE atp.`request_no`=atps.`request_no` AND atp.`employee_no`=emp.`employee_no` \n" +
+            "AND atps.`manager_id`=mgr.`manager_id` AND mgr.`employee_no`=empmgr.`employee_no` \n" +
+            "AND atp.`employee_no`=employ.`employee_no` AND DATE_FORMAT(atp.`actual_time`,\"%Y-%m-%d\")>=employ.start_date AND DATE_FORMAT(atp.`actual_time`,\"%Y-%m-%d\")<=employ.end_date  AND employ.`divisi_id`=dv.`divisi_id` AND\n" +
+            "DATE_FORMAT(atp.`actual_time`,\"%Y-%m-%d\") BETWEEN :startDate AND :endDate \n" +
+            "AND atps.`status`=nvl(:status,atps.`status`) AND atp.`employee_no`=nvl(:employeeNo,atp.`employee_no`) ORDER BY atp.`actual_time` ASC",nativeQuery = true)
+    public List<Map<String,Object>> getReportAttempdaily(@Param("startDate") String startDate,@Param("endDate") String endDate,@Param("status") String status,@Param("employeeNo") Long employeeNo);
+
 
 
 }
