@@ -190,7 +190,8 @@ public class FamilyService {
                 ()->  new CustomGenericException("This Employee Doesnt Exist")
         );
 
-        return familyRequestRepository.getListFamilyNeedApprove(employeeEntity);
+
+        return familyRequestRepository.getListFamilyRequest(employeeEntity);
     }
 
     public List<FamilyNeedApproveResponse> getListFamNeedApprove(String email){

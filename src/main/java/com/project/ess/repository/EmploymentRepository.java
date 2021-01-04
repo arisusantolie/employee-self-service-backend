@@ -16,6 +16,7 @@ public interface EmploymentRepository extends JpaRepository<EmploymentEntity,Lon
     public EmploymentBaseProj getEmployment(@Param("employee") EmployeeEntity employeeNo);
 
     @Query("select u from EmploymentEntity u,ManagerEntity mgr,DivisiEntity dv where mgr.divisiEntity=dv and dv=u.divisiEntity " +
-            "and current_date >=mgr.startDate and current_date <=mgr.endDate and mgr.employeeEntity=:employee")
+            "and current_date >=mgr.startDate and current_date <=mgr.endDate and mgr.employeeEntity=:employee and" +
+            " current_date >=u.startDate and current_date <=u.endDate and u.employee!=:employee")
     public List<EmploymentBaseProj> getMyTeam(@Param("employee") EmployeeEntity employeeEntity);
 }

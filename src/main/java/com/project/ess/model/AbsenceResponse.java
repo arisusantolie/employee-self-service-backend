@@ -19,7 +19,7 @@ public class AbsenceResponse {
     private String status;
     private String attachment;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    private String approvedDatetime;
+    private LocalDateTime approvedDatetime;
     private String requestNo;
 
 
@@ -95,11 +95,11 @@ public class AbsenceResponse {
         this.attachment = attachment;
     }
 
-    public String getApprovedDatetime() {
+    public LocalDateTime getApprovedDatetime() {
         return approvedDatetime;
     }
 
-    public void setApprovedDatetime(String approvedDatetime) {
+    public void setApprovedDatetime(LocalDateTime approvedDatetime) {
         this.approvedDatetime = approvedDatetime;
     }
 

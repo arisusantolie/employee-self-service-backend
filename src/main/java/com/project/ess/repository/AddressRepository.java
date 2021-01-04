@@ -22,7 +22,7 @@ public interface AddressRepository extends JpaRepository<AddressEntity,Long> {
 
     @Query(value = "SELECT ad.*,ars.`status`,adr.`request_date_time` FROM address ad, address_request adr,address_request_status ars WHERE ad.`address_id`=adr.`address_id` \n" +
             "AND ad.`employee_no`=:employee AND adr.`address_id`=ars.address_id AND adr.`request_no`=ars.request_no  AND (adr.address_id,adr.request_date_time) IN (SELECT ar.address_id,MAX(ar.request_date_time) FROM \n" +
-            "address_request ar,address_request_status adr WHERE ar.`request_no`=adr.`request_no` AND adr.status=\"APPROVED\" GROUP BY ar.address_id)",nativeQuery = true)
+            "address_request ar,address_request_status adr WHERE ar.`request_no`=adr.`request_no` GROUP BY ar.address_id)",nativeQuery = true)
     public List<Map<String,Object>> getAllListAddress(@Param("employee") Long empNo);
 
     @Modifying

@@ -3,6 +3,7 @@ package com.project.ess.controllers;
 import com.project.ess.dto.EmployeeDTO;
 import com.project.ess.entity.EmployeeEntity;
 import com.project.ess.execptions.CustomGenericException;
+import com.project.ess.model.EmployeeProfileResponse;
 import com.project.ess.model.EmployeeResponse;
 import com.project.ess.projection.EmploymentBaseProj;
 import com.project.ess.repository.EmployeeRepository;
@@ -34,8 +35,8 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public EmployeeEntity getDetailData(Authentication authentication){
-        return employeeRepository.findByEmail(authentication.getName()).orElseThrow(
+    public EmployeeProfileResponse getDetailData(Authentication authentication){
+        return employeeRepository.findByEmailProfile(authentication.getName()).orElseThrow(
                 ()-> new CustomGenericException("Employee Data Doesn't Exist")
         );
     }
