@@ -18,7 +18,15 @@ public class EmployeeRequestDTO {
     private String nationality;
     private String mobilePhone;
     private String maritialStatus;
+    private String remark;
 
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 
     public String getFirstName() {
         return firstName;

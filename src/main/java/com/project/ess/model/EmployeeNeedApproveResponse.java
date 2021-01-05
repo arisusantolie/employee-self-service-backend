@@ -19,8 +19,26 @@ public class EmployeeNeedApproveResponse {
     private String attachment;
     private LocalDateTime requestDateTime;
     private String employeeName;
+    private String remarkRequeuest;
+    private String remarkApproval;
 
-    public EmployeeNeedApproveResponse(Long employeeNo, String requestData, String status, LocalDateTime approvedDatetime, String fileName, String requestNo, String attachment, LocalDateTime requestDateTime, String employeeName) throws JsonProcessingException {
+    public String getRemarkRequeuest() {
+        return remarkRequeuest;
+    }
+
+    public void setRemarkRequeuest(String remarkRequeuest) {
+        this.remarkRequeuest = remarkRequeuest;
+    }
+
+    public String getRemarkApproval() {
+        return remarkApproval;
+    }
+
+    public void setRemarkApproval(String remarkApproval) {
+        this.remarkApproval = remarkApproval;
+    }
+
+    public EmployeeNeedApproveResponse(Long employeeNo, String requestData, String status, LocalDateTime approvedDatetime, String fileName, String requestNo, String attachment, LocalDateTime requestDateTime, String employeeName,String remarkRequest,String remarkApproval) throws JsonProcessingException {
         ObjectMapper objectMapper=new ObjectMapper();
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("api/v1/downloadFile/")
@@ -37,6 +55,19 @@ public class EmployeeNeedApproveResponse {
         this.attachment = fileDownloadUri;
         this.requestDateTime = requestDateTime;
         this.employeeName = employeeName;
+
+        if(remarkRequest==null){
+            this.remarkRequeuest="-";
+        }else{
+            this.remarkRequeuest=remarkRequest;
+        }
+
+        if(remarkApproval==null){
+            this.remarkApproval="-";
+        }else{
+            this.remarkApproval=remarkApproval;
+        }
+
     }
 
     public EmployeeRequestJsonData getEmployeeRequestData() {

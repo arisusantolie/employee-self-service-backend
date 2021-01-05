@@ -125,6 +125,7 @@ public class EmployeeService {
 
         employeeRequestEntity.setAttachment(uploadFileResponse.getAttachment());
         employeeRequestEntity.setFileName(uploadFileResponse.getFileName());
+        employeeRequestEntity.setRemark(request.getRemark());
 
 
 

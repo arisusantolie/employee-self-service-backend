@@ -22,13 +22,13 @@ public interface EmployeeRequestRepository extends JpaRepository<EmployeeRequest
 
 
     @Query("select new com.project.ess.model.EmployeeNeedApproveResponse(ere.employeeNo.employeeNo,ere.requestData,ers.status,ers.approvedDatetime,ere.fileName,ere.requestNo,ere.attachment," +
-            "ere.requestDateTime,concat(ere.employeeNo.firstName,' ',ere.employeeNo.lastName) )" +
+            "ere.requestDateTime,concat(ere.employeeNo.firstName,' ',ere.employeeNo.lastName),ere.remark,ers.remark )" +
             " from EmployeeRequestEntity ere,EmployeeRequestStatus ers where ere=ers.employeeRequestEntity and ers.status='PENDING' " +
             " order by ere.requestDateTime asc")
     public List<EmployeeNeedApproveResponse> getListEmpNeedApprove();
 
     @Query("select new com.project.ess.model.EmployeeNeedApproveResponse(ere.employeeNo.employeeNo,ere.requestData,ers.status,ers.approvedDatetime,ere.fileName,ere.requestNo,ere.attachment," +
-            "ere.requestDateTime,concat(ere.employeeNo.firstName,' ',ere.employeeNo.lastName) )" +
+            "ere.requestDateTime,concat(ere.employeeNo.firstName,' ',ere.employeeNo.lastName),ere.remark,ers.remark )" +
             " from EmployeeRequestEntity ere,EmployeeRequestStatus ers where ere=ers.employeeRequestEntity and ers.hraId.employeeEntity=:employee and ers.status!='PENDING' " +
             " order by ere.requestDateTime asc")
     public List<EmployeeNeedApproveResponse> getListEmpHistory(@Param("employee") EmployeeEntity employee);

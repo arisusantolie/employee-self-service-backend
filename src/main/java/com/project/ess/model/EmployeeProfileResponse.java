@@ -45,8 +45,9 @@ public class EmployeeProfileResponse {
         this.npwpNo = npwpNo;
         this.religion = religion;
 
-        if(profilePicture.isEmpty() || profilePicture==null){
-            this.profilePicture=profilePicture;
+
+        if(profilePicture==null){
+            this.profilePicture="-";
         }else{
             String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("api/v1/downloadFile/")

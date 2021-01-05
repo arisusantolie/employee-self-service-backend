@@ -30,6 +30,16 @@ public class EmployeeRequestEntity {
     @Id
     private String requestNo;
 
+    private String remark;
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
     public String getRequestNo() {
         return requestNo;
     }
