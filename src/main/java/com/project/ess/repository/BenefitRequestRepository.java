@@ -19,7 +19,7 @@ public interface BenefitRequestRepository extends JpaRepository<BenefitRequestEn
 
     @Query("select new com.project.ess.model.BenefitRequestResponse(brs.status,bre.fileName,bre.requestDateTime,brs.approvedDatetime,bre.requestNo," +
             "brs.managerId.managerId,bre.benefitBalanceId.benefitPlanEntity.benefitPlanId,bre.benefitBalanceId.benefitPlanEntity.name," +
-            "concat(brs.managerId.employeeEntity.firstName,' ',brs.managerId.employeeEntity.lastName) ) " +
+            "concat(brs.managerId.employeeEntity.firstName,' ',brs.managerId.employeeEntity.lastName),bre.amount,bre.remark ) " +
             "from BenefitRequestEntity bre,BenefitRequestStatus brs,ManagerEntity mgr where bre=brs.benefitRequestEntity and brs.managerId=mgr and " +
             "bre.benefitBalanceId=:benefitbalance order by bre.requestDateTime asc")
     public List<BenefitRequestResponse> findByBenefitBalanceIdOrderByRequestDateTimeAsc(@Param("benefitbalance") BenefitBalanceEntity benefitBalanceEntity);

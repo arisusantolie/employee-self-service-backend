@@ -29,6 +29,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -81,6 +82,9 @@ public class BenefitRequestService {
         }
 
 
+        if(request.getAmount().compareTo(BigDecimal.ZERO)<0 ){
+            throw new CustomGenericException("Amount Must Not Negative Value");
+        }
 
         BenefitBalanceEntity existBenefitBalance=benefitBalanceRepository.findByEmployeeAndPeriod(employeeEntity,LocalDate.now().getYear()).orElseThrow(
                 ()->new CustomGenericException("This Benefit Doesn't Exist")

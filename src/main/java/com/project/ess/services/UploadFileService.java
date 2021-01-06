@@ -18,6 +18,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class UploadFileService {
@@ -27,7 +29,7 @@ public class UploadFileService {
     public String UPLOAD_DIR;
 
     private Path fileStorageLocation;
-
+    private static final List<String> contentTypes = Arrays.asList("image/png", "image/jpeg", "image/jpg","application/pdf");
     public UploadFileResponse storeFile(MultipartFile file){
         String fileName= StringUtils.cleanPath(file.getOriginalFilename());
         fileName=fileName.toLowerCase().replace(" ","-");
@@ -39,19 +41,26 @@ public class UploadFileService {
                 throw new CustomGenericException("Sorry! Filename contains invalid path sequence " + fileName);
             }
 
-            Path targetLocation = fileStorageLocation.resolve(fileName);
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+            String fileContentType = file.getContentType();
+           if(contentTypes.contains(fileContentType)){
+               System.out.println(fileContentType);
+               Path targetLocation = fileStorageLocation.resolve(fileName);
+               Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("api/v1/downloadFile/")
-                    .path(fileName)
-                    .toUriString();
+               String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                       .path("api/v1/downloadFile/")
+                       .path(fileName)
+                       .toUriString();
 
 //            FileUploadDTO newData=new FileUploadDTO();
-            return new UploadFileResponse(UPLOAD_DIR+fileName,contentType,fileName);
+               return new UploadFileResponse(UPLOAD_DIR+fileName,contentType,fileName);
 //            userProfileUploadDummyControllerRepository.save(newData);
 //
 //            return new UserProfileUploadDummyDTO(fileName,contentType,fileDownloadUri);
+           }else{
+               throw new CustomGenericException("Sorry! Format File Was Not Accepted " + fileName);
+           }
+
         } catch (IOException e) {
             e.printStackTrace();
             throw new CustomGenericException("Could not store file " + fileName + ". Please try again!");

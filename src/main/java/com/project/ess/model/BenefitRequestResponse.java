@@ -3,6 +3,7 @@ package com.project.ess.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class BenefitRequestResponse {
@@ -18,6 +19,24 @@ public class BenefitRequestResponse {
     private Long benefitPlanId;
     private String benefitPlanName;
     private String managerName;
+    private BigDecimal amount;
+    private String remark;
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 
     public String getBenefitPlanName() {
         return benefitPlanName;
@@ -75,7 +94,7 @@ public class BenefitRequestResponse {
         this.requestNo = requestNo;
     }
 
-    public BenefitRequestResponse(String status, String attachment, LocalDateTime requestDateTime, LocalDateTime approvedDatetime, String requestNo, Long managerId, Long benefitPlanId,String benefitPlanName, String managerName) {
+    public BenefitRequestResponse(String status, String attachment, LocalDateTime requestDateTime, LocalDateTime approvedDatetime, String requestNo, Long managerId, Long benefitPlanId,String benefitPlanName, String managerName,BigDecimal amount,String remark) {
 
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("api/v1/downloadFile/")
@@ -91,6 +110,8 @@ public class BenefitRequestResponse {
         this.benefitPlanId = benefitPlanId;
         this.managerName = managerName;
         this.benefitPlanName=benefitPlanName;
+        this.amount=amount;
+        this.remark=remark;
     }
 
     public Long getManagerId() {
