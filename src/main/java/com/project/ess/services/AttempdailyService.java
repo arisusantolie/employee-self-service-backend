@@ -174,14 +174,15 @@ public class AttempdailyService {
                 ()->new CustomGenericException("Request Doesnt Exist")
         );
 
-        AttempdailyStatus attempdailyForChecking=attempdailyStatusRepository.getDataAttempdailyForApprove(request.getRequestNo(),attempdailyEntity.getEmployeeNo().getEmployeeNo());
+//        AttempdailyStatus attempdailyForChecking=attempdailyStatusRepository.getDataAttempdailyForApprove(request.getRequestNo(),attempdailyEntity.getEmployeeNo().getEmployeeNo());
         AttempdailyStatus attempdailyStatus=attempdailyStatusRepository.findByAttempdailyEntity(attempdailyEntity);
 
-        if(request.getStatus().equalsIgnoreCase("APPROVED") && attempdailyForChecking.getStatus().equalsIgnoreCase("REJECTED")){
-            throw new CustomGenericException("This Request Must Be Rejected, Because The Other One Request Was Rejected");
-        }else if(request.getStatus().equalsIgnoreCase("REJECTED") && attempdailyForChecking.getStatus().equalsIgnoreCase("APPROVED")){
-            throw new CustomGenericException("This Request Must Be Approved, Because The Other One Request Was Approved");
-        }
+
+//        if(request.getStatus().equalsIgnoreCase("APPROVED") && attempdailyForChecking.getStatus().equalsIgnoreCase("REJECTED")){
+//            throw new CustomGenericException("This Request Must Be Rejected, Because The Other One Request Was Rejected");
+//        }else if(request.getStatus().equalsIgnoreCase("REJECTED") && attempdailyForChecking.getStatus().equalsIgnoreCase("APPROVED")){
+//            throw new CustomGenericException("This Request Must Be Approved, Because The Other One Request Was Approved");
+//        }
 
 
         if(!attempdailyStatus.getStatus().equalsIgnoreCase("PENDING")){

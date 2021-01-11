@@ -37,10 +37,20 @@ public interface AttempdailyRepository extends JpaRepository<AttempdailyEntity,L
             "ats.status!='PENDING' and ats.managerId.employeeEntity=:employee order by ae.actualTime asc")
     public List<AttempdailyNeedResponse> getListCheckInCheckOutHistory(@Param("employee") EmployeeEntity employeeEntity);
 
-    @Query(value = "SELECT (SELECT DATE_FORMAT(atp.actual_time,\"%H:%i\") FROM attempdaily atp WHERE DATE(atp.actual_time)=DATE(attp.actual_time) AND atp.type=\"CHECKIN\" GROUP BY DATE(attp.`actual_time`)) AS checkinTime,\n" +
-            "(SELECT DATE_FORMAT(atp.actual_time,\"%H:%i\")  FROM attempdaily atp WHERE DATE(atp.actual_time)=DATE(attp.actual_time) AND atp.type=\"CHECKOUT\" GROUP BY DATE(attp.`actual_time`)) AS checkoutTime,\n" +
-            "ats.status,ats.remark,DATE_FORMAT(attp.actual_time,\"%W, %d-%b-%Y\") AS DATE FROM attempdaily attp,attempdaily_status ats WHERE attp.`request_no`=ats.request_no AND attp.employee_no=:employeeno AND DATE_FORMAT(attp.`actual_time`,\"%c\")=:month \n" +
-            "AND DATE_FORMAT(attp.actual_time,\"%Y\")=:year AND ats.status!='PENDING' GROUP BY DATE(attp.`actual_time`);",nativeQuery = true)
+    @Query(value = "SELECT checkinTime,checkoutTime,CONCAT(checkinRemark,\" + \",checkoutRemark) AS remark,`date`,\n" +
+            "CASE \n" +
+            "\tWHEN checkinStatus=\"APPROVED\" AND checkoutStatus=\"REJECTED\" THEN \"REJECTED\"\n" +
+            "\tWHEN checkinStatus=\"REJECTED\" AND checkoutStatus=\"APPROVED\" THEN \"REJECTED\"\n" +
+            "\tELSE \"APPROVED\"\n" +
+            "END AS `status` FROM (SELECT\n" +
+            "(SELECT ats.status FROM attempdaily atp,attempdaily_status ats WHERE atp.`request_no`=ats.request_no AND DATE(atp.actual_time)=DATE(attp.actual_time) AND atp.type=\"CHECKIN\" AND atp.employee_no=:employeeno GROUP BY DATE(attp.`actual_time`)) AS checkinStatus,\n" +
+            "(SELECT ats.status  FROM attempdaily atp,attempdaily_status ats WHERE atp.`request_no`=ats.request_no AND DATE(atp.actual_time)=DATE(attp.actual_time) AND atp.type=\"CHECKOUT\" AND atp.employee_no=:employeeno GROUP BY DATE(attp.`actual_time`)) AS checkoutStatus,\n" +
+            "(SELECT DATE_FORMAT(atp.actual_time,\"%H:%i\") FROM attempdaily atp WHERE DATE(atp.actual_time)=DATE(attp.actual_time) AND atp.type=\"CHECKIN\" AND atp.employee_no=:employeeno GROUP BY DATE(attp.actual_time)) AS checkinTime,\n" +
+            "(SELECT DATE_FORMAT(atp.actual_time,\"%H:%i\")  FROM attempdaily atp WHERE DATE(atp.actual_time)=DATE(attp.actual_time) AND atp.type=\"CHECKOUT\" AND atp.employee_no=:employeeno GROUP BY DATE(attp.actual_time)) AS checkoutTime,\n" +
+            "(SELECT ats.remark FROM attempdaily atp,attempdaily_status ats WHERE atp.`request_no`=ats.request_no AND DATE(atp.actual_time)=DATE(attp.actual_time) AND atp.type=\"CHECKIN\" AND atp.employee_no=:employeeno GROUP BY DATE(attp.`actual_time`)) AS checkinRemark,\n" +
+            "(SELECT ats.remark  FROM attempdaily atp,attempdaily_status ats WHERE atp.`request_no`=ats.request_no AND DATE(atp.actual_time)=DATE(attp.actual_time) AND atp.type=\"CHECKOUT\" AND atp.employee_no=:employeeno GROUP BY DATE(attp.`actual_time`)) AS checkoutRemark,\n" +
+            "ats.remark,attp.actual_time,DATE_FORMAT(attp.actual_time,\"%W, %d-%b-%Y\") AS DATE FROM attempdaily attp,attempdaily_status ats WHERE attp.`request_no`=ats.request_no AND attp.employee_no=2 AND DATE_FORMAT(attp.`actual_time`,\"%c\")=:month \n" +
+            "AND DATE_FORMAT(attp.actual_time,\"%Y\")=:year AND ats.status!='PENDING' GROUP BY DATE(attp.`actual_time`)) tabel;",nativeQuery = true)
     public List<Map<String,Object>> getListTimeSheet(@Param("employeeno") Long empNo,@Param("month") String month,@Param("year") String year);
 
     public Optional<AttempdailyEntity>  findByRequestNo(String requestNo);
